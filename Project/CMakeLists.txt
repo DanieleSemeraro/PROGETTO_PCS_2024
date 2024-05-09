@@ -46,9 +46,10 @@ list(APPEND DFN_INCLUDE ${DFN_includes})
 # Create executable
 ################################################################################
 add_executable(${PROJECT_NAME}
-	main.cpp
-	${DFN_SOURCES}
-    ${DFN_HEADERS})
+        main.cpp
+        ${DFN_SOURCES}
+    ${DFN_HEADERS}
+    utilis.hpp utilis.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${DFN_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${DFN_INCLUDE})
