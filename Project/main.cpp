@@ -15,7 +15,6 @@ int main() {
     string filename;
     vector<double> FractureId;
     vector<double> NumVertices;
-    //MatrixXd Vertices;
     vector<MatrixXd>ListVertices;
 
     cout<<"Inserire il numero di DFN da analizzare (3 10 50 82 200 362):";

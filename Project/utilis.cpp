@@ -20,9 +20,9 @@ ostream& operator<<(ostream& os, const vector<double> a)
 ostream& operator<<(ostream& os, const vector<MatrixXd> a)
 {
     for (size_t i = 0; i < a.size(); i++) {
-        os<<"Id frattura: "<<i<<" Matrice vertici: "<<endl<< a[i]<<endl;
+        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<< a[i]<<endl;
+        cout<<" "<<endl;
     }
-
     return os;
 }
 
@@ -72,11 +72,14 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
                     pv.push_back(i);
                 }
             }
-            for (int j = 0; j < NumVertices.back()-1; ++j) {
-                Vertices(a,j)=stod(line.substr(pv[j]-pv[0],pv[j]));
+            Vertices(a,0)=stod(line.substr(0,pv[0]));
+            for (int j = 1; j < NumVertices.back()-1; j++) {
+                Vertices(a,j)=stod(line.substr(pv[j-1]+1,pv[j]));
             }
+
             int b=NumVertices.back()-1;
             Vertices(a,b)=stod(line.substr(pv[b-1]+1));
+
             a=a+1;
             pv.clear();
             if(a==3){
