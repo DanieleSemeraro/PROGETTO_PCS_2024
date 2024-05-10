@@ -9,7 +9,7 @@ using namespace std;
 using namespace Eigen;
 
 
-vector<double>ImportDFN(string filename,int n,vector<double> &FractureId,vector<double> &NumVertices,MatrixXd &Vertices);
+vector<double>ImportDFN(string filename,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices);
 
 ostream& operator<<(ostream& os,const vector<double> a);
 
