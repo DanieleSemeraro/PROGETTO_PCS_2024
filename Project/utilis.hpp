@@ -13,6 +13,7 @@ vector<double>ImportDFN(string filename,int n,vector<double> &FractureId,vector<
 
 ostream& operator<<(ostream& os,const vector<double> a);
 
+ostream& operator<<(ostream& os,const vector<MatrixXd> a);
 
 
 

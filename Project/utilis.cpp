@@ -17,6 +17,15 @@ ostream& operator<<(ostream& os, const vector<double> a)
     return os;
 }
 
+ostream& operator<<(ostream& os, const vector<MatrixXd> a)
+{
+    for (size_t i = 0; i < a.size(); i++) {
+        os<<"Id frattura: "<<i<<" Matrice vertici: "<<endl<< a[i]<<endl;
+    }
+
+    return os;
+}
+
 vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices)
 {
     ifstream fin(filename);
@@ -25,7 +34,7 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
     vector<double> p;//serve a memorizzare la posizione del punto e virgola
     int a=0;//altro contatore utile alla memorizzazione dei vertici
     vector<double> pv;//serve a memorizzare la posizione del punto e virgola nei vertici
-    MatrixXd Vertices;
+    MatrixXd Vertices(3,4);
 
     while (getline(fin,line)) {
         if (line.empty() || n==atoi(line.c_str())) {
@@ -40,7 +49,6 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
         }
         else if(line[0]=='#' && line[2]=='V'){
             c=2;
-            MatrixXd Vertices(3,NumVertices.back());
             continue;
         }
 
@@ -69,33 +77,15 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
             }
             int b=NumVertices.back()-1;
             Vertices(a,b)=stod(line.substr(pv[b-1]+1));
-
-
-
-            //cout<<pv<<endl;
             a=a+1;
             pv.clear();
             if(a==3){
                 ListVertices.push_back(Vertices);
                 a=0;
                 c=0;
-
             }
-
         }
-
-
-
-
-
-
-
     }
-
-
-
-
-
 
     fin.close();
 

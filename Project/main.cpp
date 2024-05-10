@@ -24,43 +24,44 @@ int main() {
     case 3:
         filename="DFN/FR3_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
-        cout<<FractureId<<endl;
-        cout<<NumVertices<<endl;
+        cout<<"Id delle fratture: "<<FractureId<<endl;
+        cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
+        cout<<ListVertices;
         break;
     case 10:
         filename="DFN/FR10_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
-        cout<<FractureId<<endl;
-        cout<<NumVertices<<endl;
-
+        cout<<"Id delle fratture: "<<FractureId<<endl;
+        cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
+        cout<<ListVertices;
         break;
     case 50:
         filename="DFN/FR50_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
-        cout<<FractureId<<endl;
-        cout<<NumVertices<<endl;
-
+        cout<<"Id delle fratture: "<<FractureId<<endl;
+        cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
+        cout<<ListVertices;
         break;
     case 82:
         filename="DFN/FR82_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
-        cout<<FractureId<<endl;
-        cout<<NumVertices<<endl;
-
+        cout<<"Id delle fratture: "<<FractureId<<endl;
+        cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
+        cout<<ListVertices;
         break;
     case 200:
         filename="DFN/FR200_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
-        cout<<FractureId<<endl;
-        cout<<NumVertices<<endl;
-
+        cout<<"Id delle fratture: "<<FractureId<<endl;
+        cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
+        cout<<ListVertices;
         break;
     case 362:
         filename="DFN/FR362_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
-        cout<<FractureId<<endl;
-        cout<<NumVertices<<endl;
-
+        cout<<"Id delle fratture: "<<FractureId<<endl;
+        cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
+        cout<<ListVertices;
         break;
     default:
         cout<<"Data DFN non a sistema";
