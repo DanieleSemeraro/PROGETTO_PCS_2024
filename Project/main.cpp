@@ -17,7 +17,7 @@ int main() {
     vector<double> NumVertices;
     vector<MatrixXd>ListVertices;
 
-    cout<<"Inserire il numero di DFN da analizzare (3 10 50 82 200 362):";
+    cout<<"Inserire il numero di DFN da analizzare (3 10 50 82 200 362):"<<endl;
     cin>>n;
     switch (n) {
     case 3:
@@ -63,10 +63,9 @@ int main() {
         cout<<ListVertices;
         break;
     default:
-        cout<<"Data DFN non a sistema";
+        cout<<"Data DFN non a sistema" << endl;
 
     }
-
 
     return 0;
 }
