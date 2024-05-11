@@ -15,6 +15,9 @@ ostream& operator<<(ostream& os,const vector<double> a);
 
 ostream& operator<<(ostream& os,const vector<MatrixXd> a);
 
+vector<double>CalcoloTracce(int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord);
+
+
 
 
 #endif

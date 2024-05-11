@@ -96,6 +96,86 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
 
 }
 
+MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vector3d P2,Vector3d P3,MatrixXd A,Vector3d b,int i,int j){
+    Vector2d sol;
+    double norma;
+    MatrixXd punti(3,2);
+    punti<<0,0,
+           0,0,
+           0,0;
+    Vector3d P;
+    int c=0;
+
+    for (int k = 0; k < 4; ++k) {
+        if(k==3){
+            P0=ListVertices[i].col(k);
+            P1=ListVertices[i].col(0);
+        }
+        else{
+            P0=ListVertices[i].col(k);
+            P1=ListVertices[i].col(k+1);
+        }
+        for (int z = 0; z < 4; ++z) {
+            if(k==3){
+                P2=ListVertices[j].col(z);
+                P3=ListVertices[j].col(0);
+            }
+            else{
+                P2=ListVertices[j].col(z);
+                P3=ListVertices[j].col(z+1);
+            }
+            A.col(0)=P1-P0;
+            A.col(1)=P3-P2;
+            b=P2-P0;
+            norma=((P1-P0).cross(P3-P2)).norm();
+            if(norma>=0.0001){
+                sol=A.colPivHouseholderQr().solve(b);
+                P=P0+sol(0)*(P1-P0);
+                if((P0(0)<=P(0)<=P1(0) || P1(0)<=P(0)<=P0(0)) && (P0(1)<=P(1)<=P1(1) || P1(1)<=P(1)<=P0(1)) && (P0(2)<=P(2)<=P1(2) || P1(2)<=P(2)<=P0(2)))
+                {
+                    punti.col(c)=P;
+                    c=c+1;
+
+                }
+            }
+
+        }
+
+    }
+
+    return punti;
+
+}
+
+vector<double>CalcoloTracce(int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord){
+    vector<double> TraceId;
+    Vector3d P0;
+    Vector3d P1;
+    Vector3d P2;
+    Vector3d P3;
+    MatrixXd A(3,2);
+    Vector3d b;
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = i+1; j < n; ++j) {
+
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+    return TraceId;
+
+
+}
+
 
 
 
