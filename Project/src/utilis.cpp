@@ -112,7 +112,7 @@ MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vect
             P1=ListVertices[i].col(k+1);
         }
         for (int z = 0; z < NumVertices[j]; ++z) {
-            if(k==3){
+            if(z==3){
                 P2=ListVertices[j].col(z);
                 P3=ListVertices[j].col(0);
             }
@@ -124,26 +124,36 @@ MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vect
             A.col(1)=P3-P2;
             b=P2-P0;
             norma=((P1-P0).cross(P3-P2)).norm();
-            if(norma>0){
+            if(norma>0)
+            {
                 sol=A.colPivHouseholderQr().solve(b);
-                P=P0+sol(0)*(P1-P0);
-                if((P0(0)<=P(0) && P(0)<=P1(0)) || (P1(0)<=P(0) && P(0)<=P0(0)))
+                if(A*sol==b)
                 {
-                    if((P0(1)<=P(1) && P(1)<=P1(1)) || (P1(1)<=P(1) && P(1)<=P0(1)))
+                    P=P0+sol(0)*(P1-P0);
+                    //cout<<"punto "<<P<<endl;
+                    if((P0(0)<=P(0) && P(0)<=P1(0)) || (P1(0)<=P(0) && P(0)<=P0(0)))
                     {
-                        if((P0(2)<=P(2) && P(2)<=P1(2)) || (P1(2)<=P(2) && P(2)<=P0(2)))
+                        if((P0(1)<=P(1) && P(1)<=P1(1)) || (P1(1)<=P(1) && P(1)<=P0(1)))
                         {
-                            punti.col(c)=P;
-                            c=c+1;
-
+                            if((P0(2)<=P(2) && P(2)<=P1(2)) || (P1(2)<=P(2) && P(2)<=P0(2)))
+                            {
+                                //cout<<"punto p "<<P<<endl;
+                                punti.col(c)=P;
+                                c=c+1;
+                            }
                         }
+
+
                     }
 
 
                 }
+
             }
 
+
         }
+
 
     }
 
@@ -169,7 +179,7 @@ vector<double>CalcoloTracce(int n,vector<double> &FractureId,vector<double> &Num
             if(c==2){
                 ListCord.push_back(punti);
                 TraceId.push_back(ListCord.size()-1);
-                cout<<"TraceId: "<<TraceId<<" FractureId: "<<FractureId[i]<<" "<<FractureId[j]<<" Cordinates: "<<punti;
+                cout<<"TraceId: "<<TraceId<<" FractureId: "<<FractureId[i]<<" "<<FractureId[j]<<endl<<" Cordinates: "<<punti.col(0).transpose()<<"; "<<punti.col(1).transpose()<<endl;
             }
             c=0;
         }
