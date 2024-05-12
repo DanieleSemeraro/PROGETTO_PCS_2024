@@ -96,17 +96,13 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
 
 }
 
-MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vector3d P2,Vector3d P3,MatrixXd A,Vector3d b,int i,int j){
+MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vector3d P2,Vector3d P3,MatrixXd A,Vector3d b,int i,int j,int &c,vector<double> NumVertices){
     Vector2d sol;
     double norma;
     MatrixXd punti(3,2);
-    punti<<0,0,
-           0,0,
-           0,0;
     Vector3d P;
-    int c=0;
 
-    for (int k = 0; k < 4; ++k) {
+    for (int k = 0; k < NumVertices[i]; ++k) {
         if(k==3){
             P0=ListVertices[i].col(k);
             P1=ListVertices[i].col(0);
@@ -115,7 +111,7 @@ MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vect
             P0=ListVertices[i].col(k);
             P1=ListVertices[i].col(k+1);
         }
-        for (int z = 0; z < 4; ++z) {
+        for (int z = 0; z < NumVertices[j]; ++z) {
             if(k==3){
                 P2=ListVertices[j].col(z);
                 P3=ListVertices[j].col(0);
@@ -128,13 +124,21 @@ MatrixXd SystemSolve(vector<MatrixXd> &ListVertices,Vector3d P0,Vector3d P1,Vect
             A.col(1)=P3-P2;
             b=P2-P0;
             norma=((P1-P0).cross(P3-P2)).norm();
-            if(norma>=0.0001){
+            if(norma>0){
                 sol=A.colPivHouseholderQr().solve(b);
                 P=P0+sol(0)*(P1-P0);
-                if((P0(0)<=P(0)<=P1(0) || P1(0)<=P(0)<=P0(0)) && (P0(1)<=P(1)<=P1(1) || P1(1)<=P(1)<=P0(1)) && (P0(2)<=P(2)<=P1(2) || P1(2)<=P(2)<=P0(2)))
+                if((P0(0)<=P(0) && P(0)<=P1(0)) || (P1(0)<=P(0) && P(0)<=P0(0)))
                 {
-                    punti.col(c)=P;
-                    c=c+1;
+                    if((P0(1)<=P(1) && P(1)<=P1(1)) || (P1(1)<=P(1) && P(1)<=P0(1)))
+                    {
+                        if((P0(2)<=P(2) && P(2)<=P1(2)) || (P1(2)<=P(2) && P(2)<=P0(2)))
+                        {
+                            punti.col(c)=P;
+                            c=c+1;
+
+                        }
+                    }
+
 
                 }
             }
@@ -155,24 +159,24 @@ vector<double>CalcoloTracce(int n,vector<double> &FractureId,vector<double> &Num
     Vector3d P3;
     MatrixXd A(3,2);
     Vector3d b;
+    MatrixXd punti(3,2);
 
-    for (int i = 0; i < n; ++i) {
+    int c=0;//serve a verificare se abbiamo ottenuto un inntersezione passante per entrambi i bordi
+
+    for (int i = 0; i < n-1; ++i) {
         for (int j = i+1; j < n; ++j) {
-
-
-
+            punti=SystemSolve(ListVertices,P0,P1,P2,P3,A,b,i,j,c,NumVertices);
+            if(c==2){
+                ListCord.push_back(punti);
+                TraceId.push_back(ListCord.size()-1);
+                cout<<"TraceId: "<<TraceId<<" FractureId: "<<FractureId[i]<<" "<<FractureId[j]<<" Cordinates: "<<punti;
+            }
+            c=0;
         }
-
 
     }
 
-
-
-
-
-
     return TraceId;
-
 
 }
 
