@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include"Eigen/Eigen"
+#include <cmath>
 
 using namespace std;
 using namespace Eigen;
@@ -205,8 +206,6 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
     //MatrixXd punti(3,2);
     int c1=0;//contatore
     int c2=0;//contatore
-    i=0;
-    j=2;
 
     P0=ListVertices[i].col(0);
     P1=ListVertices[i].col(1);
@@ -280,7 +279,7 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                     }
                 }
                 if(c1==2){
-                    for (int k = 1; k < 2; ++k) {
+                    for (int k = 0; k < NumVertices[j]; ++k) {
                         if(k==3){
                             alpha.col(0)=t;
                             alpha.col(1)=ListVertices[j].col(0)-ListVertices[j].col(k);
@@ -309,18 +308,29 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                                     b(z)=0;
                                 }
                             }
-                            cout<<"sis "<<sis<<endl;
-                            cout<<"b "<<b<<endl;
+                            for (int z = 0; z < 3; ++z) {
+                                sis(z)=round(sis(z)*pow(10,15))/pow(10,15);
+                                b(z)=round(b(z)*pow(10,15))/pow(10,15);
+                            }
                             if(sis==b){
                                 p=P+sol(0)*t;
+                                for (int z = 0; z < 3; ++z) {
+                                    p(z)=round(p(z)*pow(10,15))/pow(10,15);
+                                }
                                 //cout<<"gigi "<<p<<endl;
+                                for (int z = 0; z < 3; ++z) {
+                                    P0(z)=round(P0(z)*pow(10,15))/pow(10,15);
+                                }
+                                for (int z = 0; z < 3; ++z) {
+                                    P1(z)=round(P1(z)*pow(10,15))/pow(10,15);
+                                }
                                 if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
                                 {
                                     if((P0(1)<=p(1) && p(1)<=P1(1)) || (P1(1)<=p(1) && p(1)<=P0(1)))
                                     {
                                         if((P0(2)<=p(2) && p(2)<=P1(2)) || (P1(2)<=p(2) && p(2)<=P0(2)))
                                         {
-                                            //cout<<"intersez: "<<c2<<endl<<p<<endl;
+                                            cout<<"intersez: "<<c2<<endl<<p<<endl;
                                             c2=c2+1;
                                         }
                                     }
@@ -329,6 +339,7 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                         }
                     }
                 }
+
                 if(c1==2 && c2==2){
                     cout<<"P "<<P.transpose()<<endl<<"t "<<t.transpose()<<endl;
                 }
