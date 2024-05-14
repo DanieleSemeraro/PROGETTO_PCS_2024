@@ -17,7 +17,8 @@ int main() {
     vector<double> NumVertices;
     vector<MatrixXd>ListVertices;
     vector<MatrixXd>ListCord;//cordinate tracce
-    vector<vector<double>>IDs;//vettori binari corrispondenti agli id delle fratture per ogni singola traccia
+    vector<VectorXd>IDs;//vettori binari corrispondenti agli id delle fratture per ogni singola traccia
+    int NumberOfTraces=0;
 
     cout<<"Inserire il numero di DFN da analizzare (3 10 50 82 200 362):"<<endl;
     cin>>n;
@@ -68,9 +69,13 @@ int main() {
         cout<<"Data DFN non a sistema" << endl;
 
     }
-    //CalcoloTraccePassanti(n,FractureId,NumVertices,ListVertices,ListCord);
-    CalcoloTracce(IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+    CalcoloTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+    cout<<"Il numero di tracce: "<<NumberOfTraces<<endl;
+    for (unsigned int i = 0; i < IDs.size(); ++i) {
+        cout<<"TraceID: "<<i<<" Fracture IDs: "<<IDs[i].transpose()<<endl;
+        cout<<"Punto P: "<<ListCord[i].col(0).transpose()<<endl<<"Direzione t: "<<ListCord[i].col(1).transpose()<<endl;
 
+    }
 
 
 
