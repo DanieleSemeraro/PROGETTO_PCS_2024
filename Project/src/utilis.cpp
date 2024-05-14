@@ -153,7 +153,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
                         b(z)=round(b(z)*pow(10,6))/pow(10,6);
                         sis1(z)=round(sis1(z)*pow(10,6))/pow(10,6);
                     }
-                    if((sis1(0)<=b(0)+0.000001 && sis1(0)>=b(0)-0.000001) && (sis1(1)<=b(1)+0.000001 && sis1(1)>=b(1)-0.000001) && (sis1(2)<=b(2)+0.000001 && sis1(2)>=b(2)-0.000001)){
+                    if((sis1(0)<=b(0)+0.00001 && sis1(0)>=b(0)-0.00001) && (sis1(1)<=b(1)+0.00001 && sis1(1)>=b(1)-0.00001) && (sis1(2)<=b(2)+0.00001 && sis1(2)>=b(2)-0.00001)){
                         for (int k = 0; k < NumVertices[i]; ++k) {
                             if(k==3){
                                 alpha.col(0)=t;
@@ -187,7 +187,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
                                     sis2(z)=round(sis2(z)*pow(10,6))/pow(10,6);
                                     b(z)=round(b(z)*pow(10,6))/pow(10,6);
                                 }
-                                if((sis2(0)<=b(0)+0.000001 && sis2(0)>=b(0)-0.000001) && (sis2(1)<=b(1)+0.000001 && sis2(1)>=b(1)-0.000001) && (sis2(2)<=b(2)+0.000001 && sis2(2)>=b(2)-0.000001)){
+                                if((sis2(0)<=b(0)+0.00001 && sis2(0)>=b(0)-0.00001) && (sis2(1)<=b(1)+0.00001 && sis2(1)>=b(1)-0.00001) && (sis2(2)<=b(2)+0.00001 && sis2(2)>=b(2)-0.00001)){
                                     p=P+sol(0)*t;
                                     //cout<<"p"<<p<<endl;
                                     for (int z = 0; z < 3; ++z) {
@@ -248,7 +248,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
                                         sis2(z)=round(sis2(z)*pow(10,6))/pow(10,6);
                                         b(z)=round(b(z)*pow(10,6))/pow(10,6);
                                     }
-                                    if((sis2(0)<=b(0)+0.000001 && sis2(0)>=b(0)-0.000001) && (sis2(1)<=b(1)+0.000001 && sis2(1)>=b(1)-0.000001) && (sis2(2)<=b(2)+0.000001 && sis2(2)>=b(2)-0.000001)){
+                                    if((sis2(0)<=b(0)+0.00001 && sis2(0)>=b(0)-0.00001) && (sis2(1)<=b(1)+0.00001 && sis2(1)>=b(1)-0.00001) && (sis2(2)<=b(2)+0.00001 && sis2(2)>=b(2)-0.00001)){
                                         p=P+sol(0)*t;
                                         //cout<<"point "<<p<<endl;
                                         for (int z = 0; z < 3; ++z) {
@@ -329,6 +329,10 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
     Vector3d C;
     Vector3d D;
     vector<double> estr;
+    ofstream Outfile("TracceID.txt");
+    Outfile<<"# Number of traces"<<endl;
+    Outfile<<NumberOfTraces<<endl;
+    Outfile<<"# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2"<<endl;
     int c=0;
     for (int k = 0; k < NumberOfTraces; ++k) {
         for (int i = 0; i < NumVertices[IDs[k](0)]; ++i) {
@@ -354,8 +358,9 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
                     sis(z)=round(sis(z)*pow(10,6))/pow(10,6);
                     b(z)=round(b(z)*pow(10,6))/pow(10,6);
                 }
-                if((sis(0)<=b(0)+0.000001 && sis(0)>=b(0)-0.000001) && (sis(1)<=b(1)+0.000001 && sis(1)>=b(1)-0.000001) && (sis(2)<=b(2)+0.000001 && sis(2)>=b(2)-0.000001)){
+                if((sis(0)<=b(0)+0.00001 && sis(0)>=b(0)-0.00001) && (sis(1)<=b(1)+0.00001 && sis(1)>=b(1)-0.00001) && (sis(2)<=b(2)+0.00001 && sis(2)>=b(2)-0.00001)){
                     p=P+sol(0)*t;
+
                     for (int z = 0; z < 3; ++z) {
                         p(z)=round(p(z)*pow(10,6))/pow(10,6);
                     }
@@ -365,14 +370,12 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
                     for (int z = 0; z < 3; ++z) {
                         P1(z)=round(P1(z)*pow(10,6))/pow(10,6);
                     }
-                    if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
+                    if(((P0(0)<p(0)||(p(0)<=P0(0)+0.00001 && p(0)>=P0(0)-0.00001)) && (p(0)<P1(0)||(p(0)<=P1(0)+0.00001 && p(0)>=P1(0)-0.00001))) || ((P0(0)>p(0)||(p(0)<=P0(0)+0.00001 && p(0)>=P0(0)-0.00001)) && (p(0)>P1(0)||(p(0)<=P1(0)+0.00001 && p(0)>=P1(0)-0.00001))))
                     {
-                        if((P0(1)<=p(1) && p(1)<=P1(1)) || (P1(1)<=p(1) && p(1)<=P0(1)))
+                        if(((P0(1)<p(1)||(p(1)<=P0(1)+0.00001 && p(1)>=P0(1)-0.00001)) && (p(1)<P1(1)||(p(1)<=P1(1)+0.00001 && p(1)>=P1(1)-0.00001))) || ((P0(1)>p(1)||(p(1)<=P0(1)+0.00001 && p(1)>=P0(1)-0.00001)) && (p(1)>P1(1)||(p(1)<=P1(1)+0.00001 && p(1)>=P1(1)-0.00001))))
                         {
-                            if((P0(2)<=p(2) && p(2)<=P1(2)) || (P1(2)<=p(2) && p(2)<=P0(2)))
+                            if(((P0(2)<p(2)||(p(2)<=P0(2)+0.00001 && p(2)>=P0(2)-0.00001)) && (p(2)<P1(2)||(p(2)<=P1(2)+0.00001 && p(2)>=P1(2)-0.00001))) || ((P0(2)>p(2)||(p(2)<=P0(2)+0.00001 && p(2)>=P0(2)-0.00001)) && (p(2)>P1(2)||(p(2)<=P1(2)+0.00001 && p(2)>=P1(2)-0.00001))))
                             {
-                                //cout<<"sas "<<i<<endl;
-                                //cout<<"punti di intersez "<<p<<endl;
                                 A=ListVertices[IDs[k](1)].col(0);
                                 B=ListVertices[IDs[k](1)].col(1);
                                 C=ListVertices[IDs[k](1)].col(2);
@@ -422,7 +425,7 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
                         sis(z)=round(sis(z)*pow(10,6))/pow(10,6);
                         b(z)=round(b(z)*pow(10,6))/pow(10,6);
                     }
-                    if((sis(0)<=b(0)+0.000001 && sis(0)>=b(0)-0.000001) && (sis(1)<=b(1)+0.000001 && sis(1)>=b(1)-0.000001) && (sis(2)<=b(2)+0.000001 && sis(2)>=b(2)-0.000001)){
+                    if((sis(0)<=b(0)+0.00001 && sis(0)>=b(0)-0.00001) && (sis(1)<=b(1)+0.00001 && sis(1)>=b(1)-0.00001) && (sis(2)<=b(2)+0.00001 && sis(2)>=b(2)-0.00001)){
                         p=P+sol(0)*t;
                         for (int z = 0; z < 3; ++z) {
                             p(z)=round(p(z)*pow(10,6))/pow(10,6);
@@ -433,14 +436,13 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
                         for (int z = 0; z < 3; ++z) {
                             P1(z)=round(P1(z)*pow(10,6))/pow(10,6);
                         }
-                        if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
+                        if(((P0(0)<p(0)||(p(0)<=P0(0)+0.00001 && p(0)>=P0(0)-0.00001)) && (p(0)<P1(0)||(p(0)<=P1(0)+0.00001 && p(0)>=P1(0)-0.00001))) || ((P0(0)>p(0)||(p(0)<=P0(0)+0.00001 && p(0)>=P0(0)-0.00001)) && (p(0)>P1(0)||(p(0)<=P1(0)+0.00001 && p(0)>=P1(0)-0.00001))))
                         {
-                            if((P0(1)<=p(1) && p(1)<=P1(1)) || (P1(1)<=p(1) && p(1)<=P0(1)))
+                            if(((P0(1)<p(1)||(p(1)<=P0(1)+0.00001 && p(1)>=P0(1)-0.00001)) && (p(1)<P1(1)||(p(1)<=P1(1)+0.00001 && p(1)>=P1(1)-0.00001))) || ((P0(1)>p(1)||(p(1)<=P0(1)+0.00001 && p(1)>=P0(1)-0.00001)) && (p(1)>P1(1)||(p(1)<=P1(1)+0.00001 && p(1)>=P1(1)-0.00001))))
                             {
-                                if((P0(2)<=p(2) && p(2)<=P1(2)) || (P1(2)<=p(2) && p(2)<=P0(2)))
+                                if(((P0(2)<p(2)||(p(2)<=P0(2)+0.00001 && p(2)>=P0(2)-0.00001)) && (p(2)<P1(2)||(p(2)<=P1(2)+0.00001 && p(2)>=P1(2)-0.00001))) || ((P0(2)>p(2)||(p(2)<=P0(2)+0.00001 && p(2)>=P0(2)-0.00001)) && (p(2)>P1(2)||(p(2)<=P1(2)+0.00001 && p(2)>=P1(2)-0.00001))))
                                 {
-                                    //cout<<"six "<<j<<endl;
-                                    //cout<<"punti di intersez "<<p<<endl;
+                                    //cout<<"puntino "<<j<<" valore "<<p<<endl;
                                     A=ListVertices[IDs[k](0)].col(0);
                                     B=ListVertices[IDs[k](0)].col(1);
                                     C=ListVertices[IDs[k](0)].col(2);
@@ -462,7 +464,6 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
                                 }
                             }
                         }
-
                     }
                 }
 
@@ -472,6 +473,7 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
         for (int z = 0; z < c; ++z) {
             cout<<estremi[z]<<endl;
         }
+        //Outfile<<k<<"; "<<IDs[k](0)<<"; "<<IDs[k](1)<<"; "<<estremi[0]<<"; "<<estremi[1]<<endl;
         c=0;
         estremi.clear();
 
@@ -497,8 +499,8 @@ bool puntoInRettangolo(Vector3d &p, Vector3d& A, Vector3d& B,Vector3d& C,Vector3
     dotADAP=round(dotADAP*pow(10,6))/pow(10,6);
     dotADAD=round(dotADAD*pow(10,6))/pow(10,6);
 
-    return 0 <= dotABAP && dotABAP <= dotABAB &&
-           0 <= dotADAP && dotADAP <= dotADAD;
+    return ( (0 < dotABAP) || (dotABAP<=0+0.00001 && dotABAP>=0-0.00001) ) && ( (dotABAP < dotABAB) || (dotABAP<=dotABAB+0.00001 && dotABAP>=dotABAB-0.00001) ) &&
+           ( (0 < dotADAP) || (dotADAP<=0+0.00001 && dotADAP>=0-0.00001) ) && ( (dotADAP < dotADAD) || (dotADAP<=dotADAD+0.00001 && dotADAP>=dotADAD-0.00001) );
 }
 
 
