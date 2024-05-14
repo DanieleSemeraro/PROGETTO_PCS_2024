@@ -202,7 +202,8 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
     MatrixXd alpha(3,2);
     Vector2d sol;
     Vector3d p;
-    Vector3d sis;
+    Vector3d sis2;
+    Vector3d sis1;
     //MatrixXd punti(3,2);
     int c1=0;//contatore
     int c2=0;//contatore
@@ -231,8 +232,12 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
         b<<d1,d2,0;
         if(A.determinant()!=0){
             P=A.colPivHouseholderQr().solve(b);
-            if(A*P==b){
-                //cout<<"P "<<P.transpose()<<endl<<"t "<<t.transpose()<<endl;
+            sis1=A*P;
+            for (int z = 0; z < 3; ++z) {
+                b(z)=round(b(z)*pow(10,6))/pow(10,6);
+                sis1(z)=round(sis1(z)*pow(10,6))/pow(10,6);
+            }
+            if((sis1(0)<=b(0)+0.000001 && sis1(0)>=b(0)-0.000001) && (sis1(1)<=b(1)+0.000001 && sis1(1)>=b(1)-0.000001) && (sis1(2)<=b(2)+0.000001 && sis1(2)>=b(2)-0.000001)){
                 for (int k = 0; k < NumVertices[i]; ++k) {
                     if(k==3){
                         alpha.col(0)=t;
@@ -251,10 +256,10 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                     }
                     if((t.cross(P1-P0)).norm()>0){
                         sol=alpha.colPivHouseholderQr().solve(b);
-                        sis=alpha*sol;
-                        for (int z = 0; z < sis.size(); ++z) {
-                            if(sis(z)==-0){
-                                sis(z)=0;
+                        sis2=alpha*sol;
+                        for (int z = 0; z < sis2.size(); ++z) {
+                            if(sis2(z)==-0){
+                                sis2(z)=0;
                             }
                         }
                         for (int z = 0; z < b.size(); ++z) {
@@ -262,8 +267,23 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                                 b(z)=0;
                             }
                         }
-                        if(sis==b){
+                        for (int z = 0; z < 3; ++z) {
+                            sis2(z)=round(sis2(z)*pow(10,6))/pow(10,6);
+                            b(z)=round(b(z)*pow(10,6))/pow(10,6);
+                        }
+                        if((sis2(0)<=b(0)+0.000001 && sis2(0)>=b(0)-0.000001) && (sis2(1)<=b(1)+0.000001 && sis2(1)>=b(1)-0.000001) && (sis2(2)<=b(2)+0.000001 && sis2(2)>=b(2)-0.000001)){
                             p=P+sol(0)*t;
+                            //cout<<"p"<<p<<endl;
+                            for (int z = 0; z < 3; ++z) {
+                                p(z)=round(p(z)*pow(10,6))/pow(10,6);
+                            }
+                            //cout<<"gigi "<<p<<endl;
+                            for (int z = 0; z < 3; ++z) {
+                                P0(z)=round(P0(z)*pow(10,6))/pow(10,6);
+                            }
+                            for (int z = 0; z < 3; ++z) {
+                                P1(z)=round(P1(z)*pow(10,6))/pow(10,6);
+                            }
                             if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
                             {
                                 if((P0(1)<=p(1) && p(1)<=P1(1)) || (P1(1)<=p(1) && p(1)<=P0(1)))
@@ -297,10 +317,10 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                         }
                         if((t.cross(P1-P0)).norm()>0){
                             sol=alpha.colPivHouseholderQr().solve(b);
-                            sis=alpha*sol;
-                            for (int z = 0; z < sis.size(); ++z) {
-                                if(sis(z)==-0){
-                                    sis(z)=0;
+                            sis2=alpha*sol;
+                            for (int z = 0; z < sis2.size(); ++z) {
+                                if(sis2(z)==-0){
+                                    sis2(z)=0;
                                 }
                             }
                             for (int z = 0; z < b.size(); ++z) {
@@ -309,20 +329,20 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                                 }
                             }
                             for (int z = 0; z < 3; ++z) {
-                                sis(z)=round(sis(z)*pow(10,15))/pow(10,15);
-                                b(z)=round(b(z)*pow(10,15))/pow(10,15);
+                                sis2(z)=round(sis2(z)*pow(10,6))/pow(10,6);
+                                b(z)=round(b(z)*pow(10,6))/pow(10,6);
                             }
-                            if(sis==b){
+                            if((sis2(0)<=b(0)+0.000001 && sis2(0)>=b(0)-0.000001) && (sis2(1)<=b(1)+0.000001 && sis2(1)>=b(1)-0.000001) && (sis2(2)<=b(2)+0.000001 && sis2(2)>=b(2)-0.000001)){
                                 p=P+sol(0)*t;
                                 for (int z = 0; z < 3; ++z) {
-                                    p(z)=round(p(z)*pow(10,15))/pow(10,15);
+                                    p(z)=round(p(z)*pow(10,6))/pow(10,6);
                                 }
                                 //cout<<"gigi "<<p<<endl;
                                 for (int z = 0; z < 3; ++z) {
-                                    P0(z)=round(P0(z)*pow(10,15))/pow(10,15);
+                                    P0(z)=round(P0(z)*pow(10,6))/pow(10,6);
                                 }
                                 for (int z = 0; z < 3; ++z) {
-                                    P1(z)=round(P1(z)*pow(10,15))/pow(10,15);
+                                    P1(z)=round(P1(z)*pow(10,6))/pow(10,6);
                                 }
                                 if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
                                 {
@@ -330,7 +350,7 @@ Vector3d SoluzioneSistema(Vector3d &P,vector<MatrixXd> &ListVertices,Vector3d P0
                                     {
                                         if((P0(2)<=p(2) && p(2)<=P1(2)) || (P1(2)<=p(2) && p(2)<=P0(2)))
                                         {
-                                            cout<<"intersez: "<<c2<<endl<<p<<endl;
+                                            //cout<<"intersez: "<<c2<<endl<<p<<endl;
                                             c2=c2+1;
                                         }
                                     }
