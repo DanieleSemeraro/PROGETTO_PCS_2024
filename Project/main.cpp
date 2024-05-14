@@ -69,13 +69,14 @@ int main() {
         cout<<"Data DFN non a sistema" << endl;
 
     }
-    CalcoloTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+    CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
     cout<<"Il numero di tracce: "<<NumberOfTraces<<endl;
     for (unsigned int i = 0; i < IDs.size(); ++i) {
         cout<<"TraceID: "<<i<<" Fracture IDs: "<<IDs[i].transpose()<<endl;
         cout<<"Punto P: "<<ListCord[i].col(0).transpose()<<endl<<"Direzione t: "<<ListCord[i].col(1).transpose()<<endl;
 
     }
+    CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord);
 
 
 

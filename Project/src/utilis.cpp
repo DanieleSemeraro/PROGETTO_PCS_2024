@@ -97,7 +97,7 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
 
 }
 
-vector<VectorXd>CalcoloTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord){
+vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord){
     Vector3d u;
     Vector3d P0;
     Vector3d P1;
@@ -313,8 +313,193 @@ vector<VectorXd>CalcoloTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,ve
 
 }
 
+vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord){
+    vector<vector<double>> estremi;
+    Vector3d P;
+    Vector3d t;
+    Vector3d P0;
+    Vector3d P1;
+    MatrixXd a(3,2);
+    Vector3d b;
+    Vector2d sol;
+    Vector3d sis;
+    Vector3d p;
+    Vector3d A;
+    Vector3d B;
+    Vector3d C;
+    Vector3d D;
+    vector<double> estr;
+    int c=0;
+    for (int k = 0; k < NumberOfTraces; ++k) {
+        for (int i = 0; i < NumVertices[IDs[k](0)]; ++i) {
+            if(i==3){
+                P=ListCord[k].col(0);
+                t=ListCord[k].col(1);
+                P0=ListVertices[IDs[k](0)].col(i);
+                P1=ListVertices[IDs[k](0)].col(0);
+            }
+            else{
+                P=ListCord[k].col(0);
+                t=ListCord[k].col(1);
+                P0=ListVertices[IDs[k](0)].col(i);
+                P1=ListVertices[IDs[k](0)].col(i+1);
+            }
+            a.col(0)=t;
+            a.col(1)=P1-P0;
+            b=P0-P;
+            if((t.cross(P1-P0)).norm()>0){
+                sol=a.colPivHouseholderQr().solve(b);
+                sis=a*sol;
+                for (int z = 0; z < 3; ++z) {
+                    sis(z)=round(sis(z)*pow(10,6))/pow(10,6);
+                    b(z)=round(b(z)*pow(10,6))/pow(10,6);
+                }
+                if((sis(0)<=b(0)+0.000001 && sis(0)>=b(0)-0.000001) && (sis(1)<=b(1)+0.000001 && sis(1)>=b(1)-0.000001) && (sis(2)<=b(2)+0.000001 && sis(2)>=b(2)-0.000001)){
+                    p=P+sol(0)*t;
+                    for (int z = 0; z < 3; ++z) {
+                        p(z)=round(p(z)*pow(10,6))/pow(10,6);
+                    }
+                    for (int z = 0; z < 3; ++z) {
+                        P0(z)=round(P0(z)*pow(10,6))/pow(10,6);
+                    }
+                    for (int z = 0; z < 3; ++z) {
+                        P1(z)=round(P1(z)*pow(10,6))/pow(10,6);
+                    }
+                    if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
+                    {
+                        if((P0(1)<=p(1) && p(1)<=P1(1)) || (P1(1)<=p(1) && p(1)<=P0(1)))
+                        {
+                            if((P0(2)<=p(2) && p(2)<=P1(2)) || (P1(2)<=p(2) && p(2)<=P0(2)))
+                            {
+                                //cout<<"sas "<<i<<endl;
+                                //cout<<"punti di intersez "<<p<<endl;
+                                A=ListVertices[IDs[k](1)].col(0);
+                                B=ListVertices[IDs[k](1)].col(1);
+                                C=ListVertices[IDs[k](1)].col(2);
+                                D=ListVertices[IDs[k](1)].col(3);
+                                for (int z = 0; z < 3; ++z) {
+                                    A(z)=round(A(z)*pow(10,6))/pow(10,6);
+                                    B(z)=round(B(z)*pow(10,6))/pow(10,6);
+                                    C(z)=round(C(z)*pow(10,6))/pow(10,6);
+                                    D(z)=round(D(z)*pow(10,6))/pow(10,6);
+                                }
+                                if(puntoInRettangolo(p,A,B,C,D)){
+                                    for (int z = 0; z < 3; ++z) {
+                                        estr.push_back(p(z));
+                                    }
+                                    estremi.push_back(estr);
+                                    c=c+1;
+                                    estr.clear();
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        if(c!=2){
+            for (int j = 0; j < NumVertices[IDs[k](1)]; ++j) {
+                if(j==3){
+                    P=ListCord[k].col(0);
+                    t=ListCord[k].col(1);
+                    P0=ListVertices[IDs[k](1)].col(j);
+                    P1=ListVertices[IDs[k](1)].col(0);
+                }
+                else{
+                    P=ListCord[k].col(0);
+                    t=ListCord[k].col(1);
+                    P0=ListVertices[IDs[k](1)].col(j);
+                    P1=ListVertices[IDs[k](1)].col(j+1);
+                }
+                a.col(0)=t;
+                a.col(1)=P1-P0;
+                b=P0-P;
+                if((t.cross(P1-P0)).norm()>0){
+                    sol=a.colPivHouseholderQr().solve(b);
+                    sis=a*sol;
+                    for (int z = 0; z < 3; ++z) {
+                        sis(z)=round(sis(z)*pow(10,6))/pow(10,6);
+                        b(z)=round(b(z)*pow(10,6))/pow(10,6);
+                    }
+                    if((sis(0)<=b(0)+0.000001 && sis(0)>=b(0)-0.000001) && (sis(1)<=b(1)+0.000001 && sis(1)>=b(1)-0.000001) && (sis(2)<=b(2)+0.000001 && sis(2)>=b(2)-0.000001)){
+                        p=P+sol(0)*t;
+                        for (int z = 0; z < 3; ++z) {
+                            p(z)=round(p(z)*pow(10,6))/pow(10,6);
+                        }
+                        for (int z = 0; z < 3; ++z) {
+                            P0(z)=round(P0(z)*pow(10,6))/pow(10,6);
+                        }
+                        for (int z = 0; z < 3; ++z) {
+                            P1(z)=round(P1(z)*pow(10,6))/pow(10,6);
+                        }
+                        if((P0(0)<=p(0) && p(0)<=P1(0)) || (P1(0)<=p(0) && p(0)<=P0(0)))
+                        {
+                            if((P0(1)<=p(1) && p(1)<=P1(1)) || (P1(1)<=p(1) && p(1)<=P0(1)))
+                            {
+                                if((P0(2)<=p(2) && p(2)<=P1(2)) || (P1(2)<=p(2) && p(2)<=P0(2)))
+                                {
+                                    //cout<<"six "<<j<<endl;
+                                    //cout<<"punti di intersez "<<p<<endl;
+                                    A=ListVertices[IDs[k](0)].col(0);
+                                    B=ListVertices[IDs[k](0)].col(1);
+                                    C=ListVertices[IDs[k](0)].col(2);
+                                    D=ListVertices[IDs[k](0)].col(3);
+                                    for (int z = 0; z < 3; ++z) {
+                                        A(z)=round(A(z)*pow(10,6))/pow(10,6);
+                                        B(z)=round(B(z)*pow(10,6))/pow(10,6);
+                                        C(z)=round(C(z)*pow(10,6))/pow(10,6);
+                                        D(z)=round(D(z)*pow(10,6))/pow(10,6);
+                                    }
+                                    if(puntoInRettangolo(p,A,B,C,D)){
+                                        for (int z = 0; z < 3; ++z) {
+                                            estr.push_back(p(z));
+                                        }
+                                        estremi.push_back(estr);
+                                        c=c+1;
+                                        estr.clear();
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+        cout<<"Per la traccia numero "<<k<<" abbiamo queste intersezioni:"<<endl;
+        for (int z = 0; z < c; ++z) {
+            cout<<estremi[z]<<endl;
+        }
+        c=0;
+        estremi.clear();
+
+    }
+
+    return NumVertices;
+
+}
 
 
+bool puntoInRettangolo(Vector3d &p, Vector3d& A, Vector3d& B,Vector3d& C,Vector3d& D) {
+    Vector3d AB = B - A;
+    Vector3d AD = D - A;
+    Vector3d AP = p - A;
+
+    double dotABAP = AB.dot(AP);
+    double dotABAB = AB.dot(AB);
+    double dotADAP = AD.dot(AP);
+    double dotADAD = AD.dot(AD);
+
+    dotABAP=round(dotABAP*pow(10,6))/pow(10,6);
+    dotABAB=round(dotABAB*pow(10,6))/pow(10,6);
+    dotADAP=round(dotADAP*pow(10,6))/pow(10,6);
+    dotADAD=round(dotADAD*pow(10,6))/pow(10,6);
+
+    return 0 <= dotABAP && dotABAP <= dotABAB &&
+           0 <= dotADAP && dotADAP <= dotADAD;
+}
 
 
 

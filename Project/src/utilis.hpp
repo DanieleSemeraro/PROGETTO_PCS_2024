@@ -15,6 +15,10 @@ ostream& operator<<(ostream& os,const vector<double> a);
 
 ostream& operator<<(ostream& os,const vector<MatrixXd> a);
 
-vector<VectorXd> CalcoloTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord);
+vector<VectorXd> CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord);
+
+vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord);
+
+bool puntoInRettangolo(Vector3d& p, Vector3d& A, Vector3d& B,Vector3d& C,Vector3d& D);
 
 #endif
