@@ -60,6 +60,9 @@ add_executable(${PROJECT_NAME}
     ${DFN_HEADERS}
     ${${CMAKE_NAME_PROJECT}_sources} ${${CMAKE_NAME_PROJECT}_headers})
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/DFN
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 target_link_libraries(${PROJECT_NAME} ${DFN_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${DFN_INCLUDE} ${${CMAKE_NAME_PROJECT}_includes})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
