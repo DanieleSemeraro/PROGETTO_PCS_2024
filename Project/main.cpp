@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <iomanip>
 #include"Eigen/Eigen"
 #include"utilis.hpp"
 
@@ -28,54 +29,54 @@ int main() {
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
-        cout<<ListVertices;
+        cout<<setprecision(15)<<ListVertices;
         break;
     case 10:
         filename="DFN/FR10_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
-        cout<<ListVertices;
+        cout<<setprecision(15)<<ListVertices;
         break;
     case 50:
         filename="DFN/FR50_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
-        cout<<ListVertices;
+        cout<<setprecision(15)<<ListVertices;
         break;
     case 82:
         filename="DFN/FR82_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
-        cout<<ListVertices;
+        cout<<setprecision(15)<<ListVertices;
         break;
     case 200:
         filename="DFN/FR200_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
-        cout<<ListVertices;
+        cout<<setprecision(15)<<ListVertices;
         break;
     case 362:
         filename="DFN/FR362_data.txt";
         ImportDFN(filename,n,FractureId,NumVertices,ListVertices);
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
-        cout<<ListVertices;
+        cout<<setprecision(15)<<ListVertices;
         break;
     default:
         cout<<"Data DFN non a sistema" << endl;
 
     }
     CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
-    cout<<"Il numero di tracce: "<<NumberOfTraces<<endl;
-    for (unsigned int i = 0; i < IDs.size(); ++i) {
-        cout<<"TraceID: "<<i<<" Fracture IDs: "<<IDs[i].transpose()<<endl;
-        cout<<"Punto P: "<<ListCord[i].col(0).transpose()<<endl<<"Direzione t: "<<ListCord[i].col(1).transpose()<<endl;
+    //cout<<"Il numero di tracce: "<<NumberOfTraces<<endl;
+    //for (unsigned int i = 0; i < IDs.size(); ++i) {
+        //cout<<"TraceID: "<<i<<" Fracture IDs: "<<IDs[i].transpose()<<endl;
+        //cout<<"Punto P: "<<setprecision(15)<<ListCord[i].col(0).transpose()<<endl<<"Direzione t: "<<setprecision(15)<<ListCord[i].col(1).transpose()<<endl;
 
-    }
+    //}
     CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord);
 
 

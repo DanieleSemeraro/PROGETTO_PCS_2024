@@ -19,6 +19,4 @@ vector<VectorXd> CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &ID
 
 vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord);
 
-bool puntoInRettangolo(Vector3d& p, Vector3d& A, Vector3d& B,Vector3d& C,Vector3d& D);
-
 #endif
