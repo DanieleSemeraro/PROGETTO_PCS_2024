@@ -17,9 +17,11 @@ int main() {
     vector<double> FractureId;
     vector<double> NumVertices;
     vector<MatrixXd>ListVertices;
-    vector<MatrixXd>ListCord;//cordinate tracce
+    vector<MatrixXd>ListCord;//contien un ounto p e la direzione della retta della traccia
     vector<VectorXd>IDs;//vettori binari corrispondenti agli id delle fratture per ogni singola traccia
     int NumberOfTraces=0;
+    vector<MatrixXd> cordinate;
+    vector<double> pass;//vettore che in ogni posizione ha 1 o 0 in base a se è passante o non passante
 
     cout<<"Inserire il numero di DFN da analizzare (3 10 50 82 200 362):"<<endl;
     cin>>n;
@@ -77,7 +79,9 @@ int main() {
         //cout<<"Punto P: "<<setprecision(15)<<ListCord[i].col(0).transpose()<<endl<<"Direzione t: "<<setprecision(15)<<ListCord[i].col(1).transpose()<<endl;
 
     //}
-    CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord);
+    cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+
+    Ordinamento(FractureId,NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,cordinate,pass);
 
 
 

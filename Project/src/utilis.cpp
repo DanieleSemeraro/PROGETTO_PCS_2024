@@ -5,6 +5,7 @@
 #include <string>
 #include"Eigen/Eigen"
 #include <iomanip>
+#include <cmath>
 
 using namespace std;
 using namespace Eigen;
@@ -255,7 +256,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
 
 }
 
-vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord){
+vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord,vector<double> &pass){
     Vector3d P;
     Vector3d t;
     Vector3d P0;
@@ -270,8 +271,10 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
     MatrixXd estremi(3,2);
     int c=0;
     int c1=0;
+    vector<MatrixXd> cordinate;
 
-    ofstream Outfile("TracceID.txt");
+
+    ofstream Outfile("Foglio1.txt");
     Outfile<<"# Number of traces"<<endl;
     Outfile<<NumberOfTraces<<endl;
     Outfile<<"# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2"<<endl;
@@ -349,6 +352,12 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
             }
 
         }
+        if( ( ((intersez(0,0)<=intersez(0,2)+tol && intersez(0,0)>=intersez(0,2)-tol)&&(intersez(1,0)<=intersez(1,2)+tol && intersez(1,0)>=intersez(1,2)-tol)&&(intersez(2,0)<=intersez(2,2)+tol && intersez(2,0)>=intersez(2,2)-tol)) || ((intersez(0,0)<=intersez(0,3)+tol && intersez(0,0)>=intersez(0,3)-tol)&&(intersez(1,0)<=intersez(1,3)+tol && intersez(1,0)>=intersez(1,3)-tol)&&(intersez(2,0)<=intersez(2,3)+tol && intersez(2,0)>=intersez(2,3)-tol)) ) && ( ((intersez(0,1)<=intersez(0,2)+tol && intersez(0,1)>=intersez(0,2)-tol)&&(intersez(1,1)<=intersez(1,2)+tol && intersez(1,1)>=intersez(1,2)-tol)&&(intersez(2,1)<=intersez(2,2)+tol && intersez(2,1)>=intersez(2,2)-tol)) || ((intersez(0,1)<=intersez(0,3)+tol && intersez(0,1)>=intersez(0,3)-tol)&&(intersez(1,1)<=intersez(1,3)+tol && intersez(1,1)>=intersez(1,3)-tol)&&(intersez(2,1)<=intersez(2,3)+tol && intersez(2,1)>=intersez(2,3)-tol)) ) ){
+            pass.push_back(0);
+        }
+        else{
+            pass.push_back(1);
+        }
         c=0;
         for (int z = 0; z < 4; ++z) {
             if((z==0 || z==1) && c1<2){
@@ -381,17 +390,72 @@ vector<double> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<d
             }
 
         }
-        cout<<"Per la traccia numero "<<k<<" abbiamo queste intersezioni:"<<endl;
-        for (int z = 0; z < 2; ++z) {
-            cout<<setprecision(15)<<estremi.col(z).transpose()<<endl;
-        }
-        Outfile<<k<<"; "<<IDs[k](0)<<"; "<<IDs[k](1)<<"; "<<estremi.col(0).transpose()<<"; "<<estremi.col(1).transpose()<<endl;
+        cordinate.push_back(estremi);
         c1=0;
     }
+    for (int z = 0; z < NumberOfTraces; ++z) {
+        Outfile<<z<<"; "<<IDs[z](0)<<"; "<<IDs[z](1)<<"; "<<cordinate[z].col(0).transpose()<<"; "<<cordinate[z].col(1).transpose()<<endl;
+    }
+    Outfile.close();
 
-    return NumVertices;
+    return cordinate;
 
 }
+
+vector<MatrixXd> Ordinamento(vector<double> FractureId,int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord, vector<MatrixXd> &cordinate,vector<double> &pass){
+    int Ntraces=0;
+    bool Tips ;
+    double length;
+
+    ofstream Outfile("Foglio2.txt");
+
+    for (unsigned int k = 0; k < FractureId.size(); ++k) {
+        for (unsigned int i = 0; i < IDs.size(); ++i) {
+            if(k==IDs[i](0) || k==IDs[i](1)){
+                Ntraces=Ntraces+1;
+            }
+        }
+        Outfile<<"# FractureId; NumTraces"<<endl;
+        Outfile<<k<<"; "<<Ntraces<<endl;
+        Ntraces=0;
+        Outfile<<"# TraceId; Tips; Length"<<endl;
+        for (unsigned int i = 0; i < IDs.size(); ++i) {
+            if(k==IDs[i](0) || k==IDs[i](1)){
+                if(pass[i]==1){
+                    Tips=true;
+                }
+                else{
+                    Tips=false;
+                }
+                length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl; //Tips stampa 1(true) se la traccia è non passante e 0(false) se la traccia è passante
+            }
+        }
+    }
+    return cordinate;
+
+}
+
+void BubbleSort(vector<double>& data)
+{
+    size_t rem_size = data.size();
+    size_t last_seen = rem_size;
+    bool swapped = true;
+
+    while (swapped) {
+        swapped = false;
+        for (size_t i = 1; i < rem_size; i++) {
+            if (data[i-1] > data[i]) {
+                swap(data[i-1], data[i]);
+                swapped = true;
+                last_seen = i;
+            }
+        }
+        //        rem_size = rem_size - 1;
+        rem_size = last_seen;
+    }
+}
+
 
 
 
