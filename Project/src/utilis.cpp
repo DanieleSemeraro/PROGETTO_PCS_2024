@@ -6,6 +6,7 @@
 #include"Eigen/Eigen"
 #include <iomanip>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 using namespace Eigen;
@@ -13,7 +14,7 @@ using namespace Eigen;
 ostream& operator<<(ostream& os, const vector<double> a)
 {
     for (size_t i = 0; i < a.size(); i++) {
-        os<< a[i]<< " ";
+        os<<setprecision(15)<< a[i]<< " ";
     }
 
     return os;
@@ -22,7 +23,7 @@ ostream& operator<<(ostream& os, const vector<double> a)
 ostream& operator<<(ostream& os, const vector<MatrixXd> a)
 {
     for (size_t i = 0; i < a.size(); i++) {
-        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<< a[i]<<endl;
+        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<<setprecision(15)<< a[i]<<endl;
         cout<<" "<<endl;
     }
     return os;
@@ -394,7 +395,7 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
         c1=0;
     }
     for (int z = 0; z < NumberOfTraces; ++z) {
-        Outfile<<z<<"; "<<IDs[z](0)<<"; "<<IDs[z](1)<<"; "<<cordinate[z].col(0).transpose()<<"; "<<cordinate[z].col(1).transpose()<<endl;
+        Outfile<<z<<"; "<<IDs[z](0)<<"; "<<IDs[z](1)<<"; "<<setprecision(15)<<cordinate[z].col(0).transpose()<<"; "<<setprecision(15)<<cordinate[z].col(1).transpose()<<endl;
     }
     Outfile.close();
 
@@ -402,10 +403,15 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
 
 }
 
-vector<MatrixXd> Ordinamento(vector<double> FractureId,int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord, vector<MatrixXd> &cordinate,vector<double> &pass){
+vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, vector<MatrixXd> &cordinate,vector<double> &pass){
     int Ntraces=0;
     bool Tips ;
     double length;
+    vector<double> lungP;
+    vector<double> lungNP;
+    double l;
+    double tol=0.00000001;
+    vector<double>  t;
 
     ofstream Outfile("Foglio2.txt");
 
@@ -417,20 +423,75 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,int &NumberOfTraces,vecto
         }
         Outfile<<"# FractureId; NumTraces"<<endl;
         Outfile<<k<<"; "<<Ntraces<<endl;
+        if(Ntraces!=0){
+            Outfile<<"# TraceId; Tips; Length"<<endl;
+        }
         Ntraces=0;
-        Outfile<<"# TraceId; Tips; Length"<<endl;
         for (unsigned int i = 0; i < IDs.size(); ++i) {
             if(k==IDs[i](0) || k==IDs[i](1)){
                 if(pass[i]==1){
-                    Tips=true;
+
+                    length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                    lungNP.push_back(length);
+
                 }
                 else{
-                    Tips=false;
+
+                    length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                    lungP.push_back(length);
+
                 }
-                length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
-                Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl; //Tips stampa 1(true) se la traccia è non passante e 0(false) se la traccia è passante
+                //length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                //Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl; //Tips stampa 1(true) se la traccia è non passante e 0(false) se la traccia è passante
             }
         }
+        BubbleSort(lungNP);
+        BubbleSort(lungP);
+        for (unsigned int j = 0; j < lungP.size(); ++j) {
+            l=lungP[j];
+            for (unsigned int i = 0; i < IDs.size(); ++i) {
+                auto it=find(t.begin(),t.end(),i);
+                if(k==IDs[i](0) || k==IDs[i](1)){
+                    if(pass[i]==0){
+                        Tips=false;
+                        length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                        if(l-tol<=length && length<=l+tol){
+                            if(it==t.end()){
+                                t.push_back(i);
+                                Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl;
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        t.clear();
+
+        for (unsigned int j = 0; j < lungNP.size(); ++j) {
+            l=lungNP[j];
+            for (unsigned int i = 0; i < IDs.size(); ++i) {
+                auto it=find(t.begin(),t.end(),i);
+                if(k==IDs[i](0) || k==IDs[i](1)){
+                    if(pass[i]==1){
+                        Tips=true;
+                        length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                        if(l-tol<=length && length<=l+tol){
+                            if(it==t.end()){
+                                t.push_back(i);
+                                Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        t.clear();
+        lungNP.clear();
+        lungP.clear();
     }
     return cordinate;
 

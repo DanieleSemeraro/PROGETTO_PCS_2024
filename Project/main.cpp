@@ -73,31 +73,10 @@ int main() {
 
     }
     CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
-    //cout<<"Il numero di tracce: "<<NumberOfTraces<<endl;
-    //for (unsigned int i = 0; i < IDs.size(); ++i) {
-        //cout<<"TraceID: "<<i<<" Fracture IDs: "<<IDs[i].transpose()<<endl;
-        //cout<<"Punto P: "<<setprecision(15)<<ListCord[i].col(0).transpose()<<endl<<"Direzione t: "<<setprecision(15)<<ListCord[i].col(1).transpose()<<endl;
 
-    //}
     cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
 
-    Ordinamento(FractureId,NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,cordinate,pass);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Ordinamento(FractureId,IDs,cordinate,pass);
 
     return 0;
 }

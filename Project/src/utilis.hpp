@@ -19,7 +19,7 @@ vector<VectorXd> CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &ID
 
 vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord,vector<double> &pass);
 
-vector<MatrixXd> Ordinamento(vector<double> FractureId,int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord, vector<MatrixXd> &cordinate,vector<double> &pass);
+vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs,vector<MatrixXd> &cordinate,vector<double> &pass);
 
 void BubbleSort(vector<double>& data);
 
