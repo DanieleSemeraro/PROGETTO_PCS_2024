@@ -506,7 +506,7 @@ void BubbleSort(vector<double>& data)
     while (swapped) {
         swapped = false;
         for (size_t i = 1; i < rem_size; i++) {
-            if (data[i-1] > data[i]) {
+            if (data[i-1] < data[i]) {
                 swap(data[i-1], data[i]);
                 swapped = true;
                 last_seen = i;
