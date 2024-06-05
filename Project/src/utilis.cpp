@@ -36,7 +36,6 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
     int c=0;//serve come contatore per scegliere cosa memorizzare e dove
     vector<double> p;//serve a memorizzare la posizione del punto e virgola
     int a=0;//altro contatore utile alla memorizzazione dei vertici
-    vector<double> pv;//serve a memorizzare la posizione del punto e virgola nei vertici
     MatrixXd Vertices;
 
     while (getline(fin,line)) {
@@ -73,19 +72,19 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
         else if(c==2){
             for (unsigned i = 0; i < line.size(); i++) {
                 if(line[i] == ';'){
-                    pv.push_back(i);
+                    p.push_back(i);
                 }
             }
-            Vertices(a,0)=stod(line.substr(0,pv[0]));
+            Vertices(a,0)=stod(line.substr(0,p[0]));
             for (int j = 1; j < NumVertices.back()-1; j++) {
-                Vertices(a,j)=stod(line.substr(pv[j-1]+1,pv[j]));
+                Vertices(a,j)=stod(line.substr(p[j-1]+1,p[j]));
             }
 
             int b=NumVertices.back()-1;
-            Vertices(a,b)=stod(line.substr(pv[b-1]+1));
+            Vertices(a,b)=stod(line.substr(p[b-1]+1));
 
             a=a+1;
-            pv.clear();
+            p.clear();
             if(a==3){
                 ListVertices.push_back(Vertices);
                 a=0;
@@ -480,6 +479,7 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, ve
         lungNP.clear();
         lungP.clear();
     }
+    Outfile.close();
     return cordinate;
 
 }

@@ -32,6 +32,9 @@ int main() {
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
         cout<<setprecision(15)<<ListVertices;
+        CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+        cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+        Ordinamento(FractureId,IDs,cordinate,pass);
         break;
     case 10:
         filename="DFN/FR10_data.txt";
@@ -39,6 +42,9 @@ int main() {
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
         cout<<setprecision(15)<<ListVertices;
+        CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+        cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+        Ordinamento(FractureId,IDs,cordinate,pass);
         break;
     case 50:
         filename="DFN/FR50_data.txt";
@@ -46,6 +52,9 @@ int main() {
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
         cout<<setprecision(15)<<ListVertices;
+        CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+        cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+        Ordinamento(FractureId,IDs,cordinate,pass);
         break;
     case 82:
         filename="DFN/FR82_data.txt";
@@ -53,6 +62,9 @@ int main() {
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
         cout<<setprecision(15)<<ListVertices;
+        CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+        cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+        Ordinamento(FractureId,IDs,cordinate,pass);
         break;
     case 200:
         filename="DFN/FR200_data.txt";
@@ -60,6 +72,9 @@ int main() {
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
         cout<<setprecision(15)<<ListVertices;
+        CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+        cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+        Ordinamento(FractureId,IDs,cordinate,pass);
         break;
     case 362:
         filename="DFN/FR362_data.txt";
@@ -67,16 +82,14 @@ int main() {
         cout<<"Id delle fratture: "<<FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<NumVertices<<endl;
         cout<<setprecision(15)<<ListVertices;
+        CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
+        cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
+        Ordinamento(FractureId,IDs,cordinate,pass);
         break;
     default:
         cout<<"Data DFN non a sistema" << endl;
 
     }
-    CalcoloDirezioneTracce(NumberOfTraces,IDs, n,FractureId,NumVertices,ListVertices,ListCord);
-
-    cordinate=CalcoloEstremi(NumberOfTraces,IDs,NumVertices,ListVertices,ListCord,pass);
-
-    Ordinamento(FractureId,IDs,cordinate,pass);
 
     return 0;
 }
