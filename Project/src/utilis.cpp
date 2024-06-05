@@ -37,7 +37,7 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
     vector<double> p;//serve a memorizzare la posizione del punto e virgola
     int a=0;//altro contatore utile alla memorizzazione dei vertici
     vector<double> pv;//serve a memorizzare la posizione del punto e virgola nei vertici
-    MatrixXd Vertices(3,4);
+    MatrixXd Vertices;
 
     while (getline(fin,line)) {
         if (line.empty() || n==atoi(line.c_str())) {
@@ -68,6 +68,7 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
             NumVertices.push_back(stod(line.substr(p[0]+1)));
             c=0;
             p.clear();
+            Vertices.resize(3,NumVertices[NumVertices.size()-1]);
         }
         else if(c==2){
             for (unsigned i = 0; i < line.size(); i++) {
