@@ -132,7 +132,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
             P2=ListVertices[i].col(2);
             u=P2-P0;
             v=P1-P0;
-            n1=(u.cross(v))/(u.norm()*v.norm());
+            n1=(u.cross(v)).normalized();
             d1=n1.dot(P0);
 
             P0=ListVertices[j].col(0);
@@ -140,7 +140,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
             P2=ListVertices[j].col(2);
             u=P2-P0;
             v=P1-P0;
-            n2=(u.cross(v))/(u.norm()*v.norm());
+            n2=(u.cross(v)).normalized();
             d2=n2.dot(P0);
 
             if((n1.cross(n2)).norm()>0){
