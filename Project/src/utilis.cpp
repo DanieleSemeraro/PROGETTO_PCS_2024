@@ -481,7 +481,7 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, ve
         lungNP.clear();
         lungP.clear();
     }
-
+  
     Outfile.close();
     return cordinate;
 

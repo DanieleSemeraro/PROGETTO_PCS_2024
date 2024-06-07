@@ -1,0 +1,24 @@
+' Ogni codice UML inizia e termina con staruml - enduml
+@startuml 
+
+'main
++ FractureId: std::vector<double> 
++ NumVertices: std::vector<double>
++ ListVertices: std::vector<MatrixXd>
++ ListCord: std::vector<MatrixXd>
++ IDs: std::vector<VectorXd>
++ NumberOfTraces:unsigned int
+'utils
+
++vector<double>ImportDFN(vector<double>&FractureId,vector<double>&NumVertices,
+                    \t \t \t  \t vector<MatrixXd>&ListVertices)
++vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,
+                        \t\t \t  vector<double>&NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord)
+
++ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,                                                                                                                                                                                                                                                                                                                                                                                                                                                \t \t \t                       vector<MatrixXd> &ListCord,vector<double> &pass)
++cordinate=CalcoloEstremi()
++ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, vector<MatrixXd> &cordinate,vector<double> &pass)
+
+void BubbleSort(vector<double>& data)
+
+@enduml
