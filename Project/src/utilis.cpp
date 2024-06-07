@@ -401,8 +401,8 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, ve
     int Ntraces=0;//num tracce totali di ogni singola frattura
     bool Tips ;// ottiene valore true se è non passante, false se è passante
     double length;//lunghezza traccia
-    vector<double> lungP;//vettore contenente le lunghezzze delle traccie passanti
-    vector<double> lungNP;//vettore contenente le lunghezzze delle traccie non passanti
+    vector<double> lungP;//vettore contenente le lunghezzze delle tracce passanti
+    vector<double> lungNP;//vettore contenente le lunghezzze delle tracce non passanti
     double l;//var di supporto lunghezza
     double tol=0.00000001;// solita tol
     vector<double>  t;//memorizza i traceid , serve per evitare di stampare più volte la stessa riga
@@ -481,6 +481,7 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, ve
         lungNP.clear();
         lungP.clear();
     }
+  
     Outfile.close();
     return cordinate;
 
