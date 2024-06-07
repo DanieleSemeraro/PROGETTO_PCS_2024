@@ -248,7 +248,7 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
 
 }
 
-vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord,vector<double> &pass){//funzione per trovare gli stremi delle fratture
+vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord,VectorXd &pass){//funzione per trovare gli stremi delle fratture
     Vector3d P;//punto della retta i prima
     Vector3d t;//direzione della retta
     Vector3d P0;//primo vertice
@@ -264,6 +264,7 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
     int c=0;//contatore che permette di memorizzare le intersez nella matrice intersez al posto giusto
     int c1=0;// contatore che aiuta a memorizzare gli estremi della frattura nella mat estremi
     vector<MatrixXd> cordinate;//vettore di matrici contenenti tutti gli estremi delle fratture
+    pass.resize(NumberOfTraces);
 
     ofstream Outfile("Foglio1.txt");//inizio a stampare sul foglio
     Outfile<<"# Number of traces"<<endl;
@@ -346,10 +347,10 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
         }
         //questo servirà poi dopo, comunque calcola se la traccia è passante o non passante.
         if( ( ((intersez(0,0)<=intersez(0,2)+tol && intersez(0,0)>=intersez(0,2)-tol)&&(intersez(1,0)<=intersez(1,2)+tol && intersez(1,0)>=intersez(1,2)-tol)&&(intersez(2,0)<=intersez(2,2)+tol && intersez(2,0)>=intersez(2,2)-tol)) || ((intersez(0,0)<=intersez(0,3)+tol && intersez(0,0)>=intersez(0,3)-tol)&&(intersez(1,0)<=intersez(1,3)+tol && intersez(1,0)>=intersez(1,3)-tol)&&(intersez(2,0)<=intersez(2,3)+tol && intersez(2,0)>=intersez(2,3)-tol)) ) && ( ((intersez(0,1)<=intersez(0,2)+tol && intersez(0,1)>=intersez(0,2)-tol)&&(intersez(1,1)<=intersez(1,2)+tol && intersez(1,1)>=intersez(1,2)-tol)&&(intersez(2,1)<=intersez(2,2)+tol && intersez(2,1)>=intersez(2,2)-tol)) || ((intersez(0,1)<=intersez(0,3)+tol && intersez(0,1)>=intersez(0,3)-tol)&&(intersez(1,1)<=intersez(1,3)+tol && intersez(1,1)>=intersez(1,3)-tol)&&(intersez(2,1)<=intersez(2,3)+tol && intersez(2,1)>=intersez(2,3)-tol)) ) ){
-            pass.push_back(0);
+            pass[k]=0;
         }
         else{
-            pass.push_back(1);
+            pass[k]=1;
         }
         c=0;
         for (int z = 0; z < 4; ++z) {//ora trovo finalmente i due estremi della frattura, immagino di sovrappore due segmenti e di trovare gli estremi della loro intersezione
@@ -389,13 +390,14 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
     for (int z = 0; z < NumberOfTraces; ++z) {// stampo sul foglio le rispettive informazioni
         Outfile<<z<<"; "<<IDs[z](0)<<"; "<<IDs[z](1)<<"; "<<setprecision(15)<<cordinate[z].col(0).transpose()<<"; "<<setprecision(15)<<cordinate[z].col(1).transpose()<<endl;
     }
+
     Outfile.close();
 
     return cordinate;
 
 }
 
-vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, vector<MatrixXd> &cordinate,vector<double> &pass){//ultima funzione che permette di calcolare il numero di tracce presenti su ogni frattura, la loro lunghezza e ordinarle in maniera decrescente
+vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, vector<MatrixXd> &cordinate,VectorXd &pass){//ultima funzione che permette di calcolare il numero di tracce presenti su ogni frattura, la loro lunghezza e ordinarle in maniera decrescente
     int Ntraces=0;//num tracce totali di ogni singola frattura
     bool Tips ;// ottiene valore true se è non passante, false se è passante
     double length;//lunghezza traccia

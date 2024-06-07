@@ -19,7 +19,7 @@ int main() {
     vector<VectorXd>IDs;//vettori binari corrispondenti agli id delle fratture per ogni singola traccia
     int NumberOfTraces=0;// numero totale di tracce su ogni rettangolo
     vector<MatrixXd> cordinate;// vettore di matrici 3x2 corrispondenti agli estremi delle fratture
-    vector<double> pass;//vettore che in ogni posizione ha 1(non passante) o 0(passante) in base a se è passante o non passante
+    VectorXd pass;//vettore che in ogni posizione ha 1(non passante) o 0(passante) in base a se è passante o non passante
 
     cout<<"Inserire il numero di DFN da analizzare (3 10 50 82 200 362):"<<endl;
     cin>>n;
