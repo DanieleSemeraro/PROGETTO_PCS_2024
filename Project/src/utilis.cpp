@@ -11,25 +11,10 @@
 using namespace std;
 using namespace Eigen;
 
-ostream& operator<<(ostream& os, const vector<double> a)
-{
-    for (size_t i = 0; i < a.size(); i++) {
-        os<<setprecision(15)<< a[i]<< " ";
-    }
+namespace DFNLibrary{
 
-    return os;
-}
 
-ostream& operator<<(ostream& os, const vector<MatrixXd> a)
-{
-    for (size_t i = 0; i < a.size(); i++) {
-        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<<setprecision(15)<< a[i]<<endl;
-        cout<<" "<<endl;
-    }
-    return os;
-}
-
-vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices)
+void ImportDFN(const string &filename,int n,Fractures& fractures)
 {
     ifstream fin(filename);
     string line;
@@ -38,7 +23,7 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
     int a=0;//altro contatore utile alla memorizzazione dei vertici
     MatrixXd Vertices;
 
-    while (getline(fin,line)) {
+    while (getline(fin,line )) {
         if (line.empty() || n==atoi(line.c_str())) {
             continue;
         }
@@ -63,11 +48,11 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
                     p.push_back(i);
                 }
             }
-            FractureId.push_back(stod(line.substr(0,p[0])));
-            NumVertices.push_back(stod(line.substr(p[0]+1)));
+            fractures.FractureId.push_back(stod(line.substr(0,p[0])));
+            fractures.NumVertices.push_back(stod(line.substr(p[0]+1)));
             c=0;
             p.clear();
-            Vertices.resize(3,NumVertices[NumVertices.size()-1]);
+            Vertices.resize(3,fractures.NumVertices[fractures.NumVertices.size()-1]);
         }
         else if(c==2){
             for (unsigned i = 0; i < line.size(); i++) {
@@ -76,17 +61,17 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
                 }
             }
             Vertices(a,0)=stod(line.substr(0,p[0]));
-            for (int j = 1; j < NumVertices.back()-1; j++) {
+            for (int j = 1; j < fractures.NumVertices.back()-1; j++) {
                 Vertices(a,j)=stod(line.substr(p[j-1]+1,p[j]));
             }
 
-            int b=NumVertices.back()-1;
+            int b=fractures.NumVertices.back()-1;
             Vertices(a,b)=stod(line.substr(p[b-1]+1));
 
             a=a+1;
             p.clear();
             if(a==3){
-                ListVertices.push_back(Vertices);
+                fractures.ListVertices.push_back(Vertices);
                 a=0;
                 c=0;
             }
@@ -95,11 +80,9 @@ vector<double> ImportDFN(string filename,int n,vector<double> &FractureId,vector
 
     fin.close();
 
-    return FractureId;
 
 }
-
-vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord){//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
+void Traces::CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int n,Traces& traces){//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
     Vector3d u;//vettore 1
     Vector3d P0;//primo punto del piano
     Vector3d P1;//secondo punto del piano
@@ -127,17 +110,17 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
 
     for (int i = 0; i < n-1; ++i) {//doppio ciclo per confrontare ogni rettangolo con gli altri per trovare eventuai tracce
         for (int j = i+1; j < n; ++j) {
-            P0=ListVertices[i].col(0);
-            P1=ListVertices[i].col(1);
-            P2=ListVertices[i].col(2);
+            P0=fractures.ListVertices[i].col(0);
+            P1=fractures.ListVertices[i].col(1);
+            P2=fractures.ListVertices[i].col(2);
             u=P2-P0;
             v=P1-P0;
             n1=(u.cross(v)).normalized();
             d1=n1.dot(P0);
 
-            P0=ListVertices[j].col(0);
-            P1=ListVertices[j].col(1);
-            P2=ListVertices[j].col(2);
+            P0=fractures.ListVertices[j].col(0);
+            P1=fractures.ListVertices[j].col(1);
+            P2=fractures.ListVertices[j].col(2);
             u=P2-P0;
             v=P1-P0;
             n2=(u.cross(v)).normalized();
@@ -153,20 +136,20 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
                     P=A.colPivHouseholderQr().solve(b);
                     sis1=A*P;
                     if((sis1(0)<=b(0)+tol && sis1(0)>=b(0)-tol) && (sis1(1)<=b(1)+tol && sis1(1)>=b(1)-tol) && (sis1(2)<=b(2)+tol && sis1(2)>=b(2)-tol)){// verifico che sis1 sia uguale a b rispetto una tolleranza tol
-                        for (int k = 0; k < NumVertices[i]; ++k) {//ora devo vedere se la retta trovata sia effetivamente una frattura oppure no. devo trovare le intersezioni tra la retta e la prima frattura e verificare che siano comprese tra i vertici del bordo
+                        for (int k = 0; k < fractures.NumVertices[i]; ++k) {//ora devo vedere se la retta trovata sia effetivamente una frattura oppure no. devo trovare le intersezioni tra la retta e la prima frattura e verificare che siano comprese tra i vertici del bordo
                             if(k==3){
                                 alpha.col(0)=t;
-                                alpha.col(1)=ListVertices[i].col(0)-ListVertices[i].col(k);
-                                P0=ListVertices[i].col(k);
-                                P1=ListVertices[i].col(0);
-                                b=ListVertices[i].col(k)-P;
+                                alpha.col(1)=fractures.ListVertices[i].col(0)-fractures.ListVertices[i].col(k);
+                                P0=fractures.ListVertices[i].col(k);
+                                P1=fractures.ListVertices[i].col(0);
+                                b=fractures.ListVertices[i].col(k)-P;
                             }
                             else{
                                 alpha.col(0)=t;
-                                alpha.col(1)=ListVertices[i].col(k+1)-ListVertices[i].col(k);
-                                P0=ListVertices[i].col(k);
-                                P1=ListVertices[i].col(k+1);
-                                b=ListVertices[i].col(k)-P;
+                                alpha.col(1)=fractures.ListVertices[i].col(k+1)-fractures.ListVertices[i].col(k);
+                                P0=fractures.ListVertices[i].col(k);
+                                P1=fractures.ListVertices[i].col(k+1);
+                                b=fractures.ListVertices[i].col(k)-P;
                             }
                             if((t.cross(P1-P0)).norm()>0){
                                 sol=alpha.colPivHouseholderQr().solve(b);
@@ -188,21 +171,21 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
                             }
                         }
                         if(c1==2){//nel caso affermativo che la retta intersechi due volte la prima frattura verifico che lo faccia anche con la seconda, in caso contrario ho risparmiato dei calcoli
-                            for (int k = 0; k < NumVertices[j]; ++k) {
+                            for (int k = 0; k < fractures.NumVertices[j]; ++k) {
                                 if(k==3){
                                     alpha.col(0)=t;
-                                    alpha.col(1)=ListVertices[j].col(0)-ListVertices[j].col(k);
-                                    P0=ListVertices[j].col(k);
-                                    P1=ListVertices[j].col(0);
-                                    b=ListVertices[j].col(k)-P;
+                                    alpha.col(1)=fractures.ListVertices[j].col(0)-fractures.ListVertices[j].col(k);
+                                    P0=fractures.ListVertices[j].col(k);
+                                    P1=fractures.ListVertices[j].col(0);
+                                    b=fractures.ListVertices[j].col(k)-P;
 
                                 }
                                 else{
                                     alpha.col(0)=t;
-                                    alpha.col(1)=ListVertices[j].col(k+1)-ListVertices[j].col(k);
-                                    P0=ListVertices[j].col(k);
-                                    P1=ListVertices[j].col(k+1);
-                                    b=ListVertices[j].col(k)-P;
+                                    alpha.col(1)=fractures.ListVertices[j].col(k+1)-fractures.ListVertices[j].col(k);
+                                    P0=fractures.ListVertices[j].col(k);
+                                    P1=fractures.ListVertices[j].col(k+1);
+                                    b=fractures.ListVertices[j].col(k)-P;
                                 }
                                 if((t.cross(P1-P0)).norm()>0){
                                     sol=alpha.colPivHouseholderQr().solve(b);
@@ -228,11 +211,11 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
 
                         if(c1==2 && c2==2){//nel caso in cui la retta intersechi due volte sia un rettang che l altro vuol dire che è quella di un frattura fra essi quindi procedo a memorizzarmi le info utili
 
-                            vet<<FractureId[i],FractureId[j];
-                            IDs.push_back(vet);
+                            vet<<fractures.FractureId[i],fractures.FractureId[j];
+                            traces.IDs.push_back(vet);
                             mat.col(0)=P;
                             mat.col(1)=t;
-                            ListCord.push_back(mat);
+                            traces.ListCord.push_back(mat);
                             NumberOfTraces=NumberOfTraces+1;
                         }
                         c1=0;
@@ -244,11 +227,11 @@ vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs
         }
     }
 
-    return IDs;
+
 
 }
+void Traces::CalcoloEstremi(int &NumberOfTraces,Fractures &fractures, Traces &traces){//funzione per trovare gli stremi delle fratture
 
-vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord,VectorXd &pass){//funzione per trovare gli stremi delle fratture
     Vector3d P;//punto della retta i prima
     Vector3d t;//direzione della retta
     Vector3d P0;//primo vertice
@@ -263,7 +246,7 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
     MatrixXd estremi(3,2);//mat dei due estremi della frattura
     int c=0;//contatore che permette di memorizzare le intersez nella matrice intersez al posto giusto
     int c1=0;// contatore che aiuta a memorizzare gli estremi della frattura nella mat estremi
-    vector<MatrixXd> cordinate;//vettore di matrici contenenti tutti gli estremi delle fratture
+
     pass.resize(NumberOfTraces);
 
     ofstream Outfile("Foglio1.txt");//inizio a stampare sul foglio
@@ -272,18 +255,18 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
     Outfile<<"# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2"<<endl;
 
     for (int k = 0; k < NumberOfTraces; ++k) {//per ogni traccia devo trovare gli estremi
-        for (int i = 0; i < NumVertices[IDs[k](0)]; ++i) {//IDs[k](0) significa che k sarebbe il traceID , quindi nella traccia numero k so che è data da una frattura a e una frattura b e ora trovo le intersez della a (per questo lo 0) dopo mettero 1
+        for (int i = 0; i < fractures.NumVertices[IDs[k](0)]; ++i) {//IDs[k](0) significa che k sarebbe il traceID , quindi nella traccia numero k so che è data da una frattura a e una frattura b e ora trovo le intersez della a (per questo lo 0) dopo mettero 1
             if(i==3){
-                P=ListCord[k].col(0);
-                t=ListCord[k].col(1);
-                P0=ListVertices[IDs[k](0)].col(i);
-                P1=ListVertices[IDs[k](0)].col(0);
+                P=traces.ListCord[k].col(0);
+                t=traces.ListCord[k].col(1);
+                P0=fractures.ListVertices[IDs[k](0)].col(i);
+                P1=fractures.ListVertices[IDs[k](0)].col(0);
             }
             else{
-                P=ListCord[k].col(0);
-                t=ListCord[k].col(1);
-                P0=ListVertices[IDs[k](0)].col(i);
-                P1=ListVertices[IDs[k](0)].col(i+1);
+                P=traces.ListCord[k].col(0);
+                t=traces.ListCord[k].col(1);
+                P0=fractures.ListVertices[IDs[k](0)].col(i);
+                P1=fractures.ListVertices[IDs[k](0)].col(i+1);
             }
             a.col(0)=t;
             a.col(1)=P1-P0;
@@ -309,18 +292,18 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
                 }
             }
         }
-        for (int j = 0; j < NumVertices[IDs[k](1)]; ++j) {//verifico le stesse cose ma con il secondo rettangolo impiegato nella traccia
+        for (int j = 0; j < fractures.NumVertices[IDs[k](1)]; ++j) {//verifico le stesse cose ma con il secondo rettangolo impiegato nella traccia
             if(j==3){
-                P=ListCord[k].col(0);
-                t=ListCord[k].col(1);
-                P0=ListVertices[IDs[k](1)].col(j);
-                P1=ListVertices[IDs[k](1)].col(0);
+                P=traces.ListCord[k].col(0);
+                t=traces.ListCord[k].col(1);
+                P0=fractures.ListVertices[IDs[k](1)].col(j);
+                P1=fractures.ListVertices[IDs[k](1)].col(0);
             }
             else{
-                P=ListCord[k].col(0);
-                t=ListCord[k].col(1);
-                P0=ListVertices[IDs[k](1)].col(j);
-                P1=ListVertices[IDs[k](1)].col(j+1);
+                P=traces.ListCord[k].col(0);
+                t=traces.ListCord[k].col(1);
+                P0=fractures.ListVertices[IDs[k](1)].col(j);
+                P1=fractures.ListVertices[IDs[k](1)].col(j+1);
             }
             a.col(0)=t;
             a.col(1)=P1-P0;
@@ -347,10 +330,10 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
         }
         //questo servirà poi dopo, comunque calcola se la traccia è passante o non passante.
         if( ( ((intersez(0,0)<=intersez(0,2)+tol && intersez(0,0)>=intersez(0,2)-tol)&&(intersez(1,0)<=intersez(1,2)+tol && intersez(1,0)>=intersez(1,2)-tol)&&(intersez(2,0)<=intersez(2,2)+tol && intersez(2,0)>=intersez(2,2)-tol)) || ((intersez(0,0)<=intersez(0,3)+tol && intersez(0,0)>=intersez(0,3)-tol)&&(intersez(1,0)<=intersez(1,3)+tol && intersez(1,0)>=intersez(1,3)-tol)&&(intersez(2,0)<=intersez(2,3)+tol && intersez(2,0)>=intersez(2,3)-tol)) ) && ( ((intersez(0,1)<=intersez(0,2)+tol && intersez(0,1)>=intersez(0,2)-tol)&&(intersez(1,1)<=intersez(1,2)+tol && intersez(1,1)>=intersez(1,2)-tol)&&(intersez(2,1)<=intersez(2,2)+tol && intersez(2,1)>=intersez(2,2)-tol)) || ((intersez(0,1)<=intersez(0,3)+tol && intersez(0,1)>=intersez(0,3)-tol)&&(intersez(1,1)<=intersez(1,3)+tol && intersez(1,1)>=intersez(1,3)-tol)&&(intersez(2,1)<=intersez(2,3)+tol && intersez(2,1)>=intersez(2,3)-tol)) ) ){
-            pass[k]=0;
+            traces.pass[k]=0;
         }
         else{
-            pass[k]=1;
+            traces.pass[k]=1;
         }
         c=0;
         for (int z = 0; z < 4; ++z) {//ora trovo finalmente i due estremi della frattura, immagino di sovrappore due segmenti e di trovare gli estremi della loro intersezione
@@ -388,16 +371,18 @@ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector
         c1=0;
     }
     for (int z = 0; z < NumberOfTraces; ++z) {// stampo sul foglio le rispettive informazioni
-        Outfile<<z<<"; "<<IDs[z](0)<<"; "<<IDs[z](1)<<"; "<<setprecision(15)<<cordinate[z].col(0).transpose()<<"; "<<setprecision(15)<<cordinate[z].col(1).transpose()<<endl;
+        Outfile<<z<<"; "<<traces.IDs[z](0)<<"; "<<traces.IDs[z](1)<<"; "<<setprecision(15)<<cordinate[z].col(0).transpose()<<"; "<<setprecision(15)<<cordinate[z].col(1).transpose()<<endl;
     }
 
     Outfile.close();
 
-    return cordinate;
+
 
 }
 
-vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, vector<MatrixXd> &cordinate,VectorXd &pass){//ultima funzione che permette di calcolare il numero di tracce presenti su ogni frattura, la loro lunghezza e ordinarle in maniera decrescente
+
+void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di calcolare il numero di tracce presenti su ogni frattura, la loro lunghezza e ordinarle in maniera decrescente
+
     int Ntraces=0;//num tracce totali di ogni singola frattura
     bool Tips ;// ottiene valore true se è non passante, false se è passante
     double length;//lunghezza traccia
@@ -409,7 +394,7 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, ve
 
     ofstream Outfile("Foglio2.txt");
 
-    for (unsigned int k = 0; k < FractureId.size(); ++k) {// per ogni frattura devo visualizzare delle cose
+    for (unsigned int k = 0; k < fractures.FractureId.size(); ++k) {// per ogni frattura devo visualizzare delle cose
         for (unsigned int i = 0; i < IDs.size(); ++i) {//calcolo il num di tracce  totali su di essa
             if(k==IDs[i](0) || k==IDs[i](1)){
                 Ntraces=Ntraces+1;
@@ -481,12 +466,39 @@ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, ve
         lungNP.clear();
         lungP.clear();
     }
-  
+
     Outfile.close();
-    return cordinate;
+
 
 }
 
+
+
+
+
+
+
+
+
+}
+
+ostream& operator<<(ostream& os, const vector<double> a)
+{
+    for (size_t i = 0; i < a.size(); i++) {
+        os<<setprecision(15)<< a[i]<< " ";
+    }
+
+    return os;
+}
+
+ostream& operator<<(ostream& os, const vector<MatrixXd> a)
+{
+    for (size_t i = 0; i < a.size(); i++) {
+        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<<setprecision(15)<< a[i]<<endl;
+        cout<<" "<<endl;
+    }
+    return os;
+}
 void BubbleSort(vector<double>& data)//algoritmo bubblesort spiegato in classe, dato un vet in input lo restituisce riordinato
 {
     size_t rem_size = data.size();
@@ -505,6 +517,12 @@ void BubbleSort(vector<double>& data)//algoritmo bubblesort spiegato in classe, 
         rem_size = last_seen;
     }
 }
+
+
+
+
+
+
 
 
 
