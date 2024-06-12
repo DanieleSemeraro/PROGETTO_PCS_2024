@@ -12,13 +12,13 @@ namespace DFNLibrary {
 
 struct Fractures{
 
-    vector<double> FractureId;// id delle fratture
-    vector<double> NumVertices;// numero vertici delle fratture
+    vector<int> FractureId;// id delle fratture
+    vector<int> NumVertices;// numero vertici delle fratture
     vector<MatrixXd> ListVertices;//matrici con le cordinate dei vertici
 
     Fractures() = default;
-    Fractures(const vector<double> &FractureId,
-              const vector<double> &NumVertices,
+    Fractures(const vector<int> &FractureId,
+              const vector<int> &NumVertices,
               const vector<MatrixXd> &ListVertices):
         FractureId(FractureId),// Inizializza il membro FractureId con il parametro FractureId
         NumVertices(NumVertices),//
@@ -29,14 +29,14 @@ struct Fractures{
 struct Traces{
 
     vector<MatrixXd> ListCord;//contien un punto p e la direzione della retta della traccia t
-    vector<VectorXd> IDs;//vettori binari corrispondenti agli id delle fratture per ogni singola traccia
-    VectorXd pass; // vettore che in ogni posizione ha 1(non passante) o 0(passante) in base a se è passante o non passante
+    vector<VectorXi> IDs;//vettori binari corrispondenti agli id delle fratture per ogni singola traccia
+    VectorXi pass; // vettore che in ogni posizione ha 1(non passante) o 0(passante) in base a se è passante o non passante
     vector<MatrixXd> cordinate;//vettore di matrici contenenti tutti gli estremi delle fratture
     Traces() = default;
     Traces(const vector<MatrixXd> &ListCord,
-              const vector<VectorXd> &IDs,
+              const vector<VectorXi> &IDs,
               const vector<MatrixXd> &cordinate,
-              const VectorXd& pass):
+              const VectorXi& pass):
         ListCord(ListCord),// Inizializza il membro ListCord con il parametro FractureId
         IDs(IDs),//
         pass(pass),//
@@ -52,7 +52,7 @@ struct Traces{
 void ImportDFN(const string& filename,int n,Fractures& fractures);//funzione che importa i dati dai file DFN
 
 }
-ostream& operator<<(ostream& os,const vector<double> a);
+ostream& operator<<(ostream& os,const vector<int> a);
 
 ostream& operator<<(ostream& os,const vector<MatrixXd> a);
 

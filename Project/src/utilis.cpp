@@ -48,8 +48,8 @@ void ImportDFN(const string &filename,int n,Fractures& fractures)
                     p.push_back(i);
                 }
             }
-            fractures.FractureId.push_back(stod(line.substr(0,p[0])));
-            fractures.NumVertices.push_back(stod(line.substr(p[0]+1)));
+            fractures.FractureId.push_back(stoi(line.substr(0,p[0])));
+            fractures.NumVertices.push_back(stoi(line.substr(p[0]+1)));
             c=0;
             p.clear();
             Vertices.resize(3,fractures.NumVertices[fractures.NumVertices.size()-1]);
@@ -91,7 +91,7 @@ void Traces::CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int
     Vector3d b;//vettore del sistema con matrice A. usato anche per il secondo sist linear
     Vector3d P;//punto soluzione del sistema A*P=b.
     Vector3d v;//vettore 2
-    Vector2d vet;//var usata per memorizzare i due id delle fratture con traccia
+    Vector2i vet;//var usata per memorizzare i due id delle fratture con traccia
     MatrixXd mat(3,2);//var usata per memor il punto e la direzione della retta
     Vector3d n1;//direzione piano 1 normalizzata
     Vector3d n2;//direzione piano 2 normalizzata
@@ -371,7 +371,7 @@ void Traces::CalcoloEstremi(int &NumberOfTraces,Fractures &fractures, Traces &tr
         c1=0;
     }
     for (int z = 0; z < NumberOfTraces; ++z) {// stampo sul foglio le rispettive informazioni
-        Outfile<<z<<"; "<<traces.IDs[z](0)<<"; "<<traces.IDs[z](1)<<"; "<<setprecision(15)<<cordinate[z].col(0).transpose()<<"; "<<setprecision(15)<<cordinate[z].col(1).transpose()<<endl;
+        Outfile<<z<<"; "<<traces.IDs[z](0)<<"; "<<traces.IDs[z](1)<<"; "<<scientific<<setprecision(16)<<cordinate[z].col(0).transpose()<<"; "<<scientific<<setprecision(16)<<cordinate[z].col(1).transpose()<<endl;
     }
 
     Outfile.close();
@@ -431,7 +431,7 @@ void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di
                         if(l-tol<=length && length<=l+tol){
                             if(it==t.end()){
                                 t.push_back(i);//memorizza gli traceID sempre per il fatto di non stampare più volte le stesse righe
-                                Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl;
+                                Outfile<<i<<"; "<<Tips<<"; "<<scientific<<setprecision(16)<<length<<endl;
                             }
                         }
                     }
@@ -454,7 +454,7 @@ void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di
                         if(l-tol<=length && length<=l+tol){
                             if(it==t.end()){
                                 t.push_back(i);
-                                Outfile<<i<<"; "<<Tips<<"; "<<setprecision(15)<<length<<endl;
+                                Outfile<<i<<"; "<<Tips<<"; "<<scientific<<setprecision(16)<<length<<endl;
                             }
                         }
                     }
@@ -482,10 +482,10 @@ void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di
 
 }
 
-ostream& operator<<(ostream& os, const vector<double> a)
+ostream& operator<<(ostream& os, const vector<int> a)
 {
     for (size_t i = 0; i < a.size(); i++) {
-        os<<setprecision(15)<< a[i]<< " ";
+        os<<scientific<<setprecision(16)<< a[i]<< " ";
     }
 
     return os;
@@ -494,11 +494,12 @@ ostream& operator<<(ostream& os, const vector<double> a)
 ostream& operator<<(ostream& os, const vector<MatrixXd> a)
 {
     for (size_t i = 0; i < a.size(); i++) {
-        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<<setprecision(15)<< a[i]<<endl;
+        os<<"Id frattura: "<<i<<endl<<"Matrice vertici: "<<endl<<scientific<<setprecision(16)<< a[i]<<endl;
         cout<<" "<<endl;
     }
     return os;
 }
+
 void BubbleSort(vector<double>& data)//algoritmo bubblesort spiegato in classe, dato un vet in input lo restituisce riordinato
 {
     size_t rem_size = data.size();

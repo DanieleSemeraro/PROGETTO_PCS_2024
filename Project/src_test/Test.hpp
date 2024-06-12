@@ -10,7 +10,7 @@ using namespace std;
 using namespace Eigen;
 namespace DFNLibrary {
 
-bool VectorsAreEqual(const VectorXd& vec1, const VectorXd& vec2) {
+bool VectorsAreEquali(const VectorXi& vec1, const VectorXi& vec2) {
     if (vec1.size() != vec2.size()) {
         return false;
     }
@@ -22,6 +22,17 @@ bool VectorsAreEqual(const VectorXd& vec1, const VectorXd& vec2) {
     return true;
 }
 
+bool VectorsAreEquald(const VectorXd& vec1, const VectorXd& vec2) {
+    if (vec1.size() != vec2.size()) {
+        return false;
+    }
+    for (Eigen::Index i = 0; i < vec1.size(); ++i) {
+        if (vec1[i] != vec2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (3 fratture) per assicurarsi che il codice funzioni
 
@@ -39,14 +50,14 @@ TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (
     EXPECT_EQ(traces.IDs.size(), 2);
     EXPECT_EQ(traces.ListCord.size(), 2);
 
-    VectorXd first_trace(2); // la prima traccia salvata in IDs è quella
+    VectorXi first_trace(2); // la prima traccia salvata in IDs è quella
     first_trace << 0,1; // tra la frattura 0 e la frattura 1
 
-    VectorXd second_trace(2);
+    VectorXi second_trace(2);
     second_trace << 0,2;
 
-    EXPECT_TRUE(VectorsAreEqual(traces.IDs[0], first_trace)); //controllo che IDs salvi gli elementi in modo corretto
-    EXPECT_TRUE(VectorsAreEqual(traces.IDs[1], second_trace));
+    EXPECT_TRUE(VectorsAreEquali(traces.IDs[0], first_trace)); //controllo che IDs salvi gli elementi in modo corretto
+    EXPECT_TRUE(VectorsAreEquali(traces.IDs[1], second_trace));
 
     Vector3d DirFirstTrace; // il vettore direzionale della prima traccia è (0,-1,0)
     DirFirstTrace << 0,-1,0;
@@ -56,8 +67,8 @@ TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (
     DirSecondTrace << 1,0,0;
     Vector3d t2 =traces.ListCord[1].col(1);
 
-    EXPECT_TRUE(VectorsAreEqual(DirFirstTrace, t1));
-    EXPECT_TRUE(VectorsAreEqual(DirSecondTrace, t2));
+    EXPECT_TRUE(VectorsAreEquald(DirFirstTrace, t1));
+    EXPECT_TRUE(VectorsAreEquald(DirSecondTrace, t2));
 }
 
 
@@ -90,10 +101,10 @@ TEST(FRACTURETEST, TestCalcoloEstremi) {
 
     EXPECT_TRUE(traces.cordinate[1].isApprox(ExtremesSecondTrace, 1e-8));
 
-    Vector2d TraccePassanti;
+    Vector2i TraccePassanti;
     TraccePassanti << 0, 1; // la prima traccia è passante, la seconda no
 
-    EXPECT_TRUE(VectorsAreEqual(TraccePassanti, traces.pass));
+    EXPECT_TRUE(VectorsAreEquali(TraccePassanti, traces.pass));
 }
 }
 
