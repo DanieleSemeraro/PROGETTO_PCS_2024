@@ -79,9 +79,56 @@ void ImportDFN(const string &filename,int n,Fractures& fractures)
     }
 
     fin.close();
+}
 
+void sfere(Fractures& fractures, int n,vector<Vector3d> &baricentri){
+    vector<vector<int>> fratturescluse;//conterra tutte le coppie di fratture che sicuramente non creeranno tracce
+    int numver=0;//numero vertici frattura
+    Vector3d A;//vertici
+    Vector3d B;
+    Vector3d C;
+    double area;//area dei triangoli
+    Vector3d AB;//lati triangoli per calcolo area
+    Vector3d AC;
+    Vector3d centroidtriangle;//baricentro triangolo
+    double areatotale=0;
+    Vector3d bari;//baricentro della frattura
+    bari<<0,0,0;
+    double tol=0.00000001;
+    for (int i = 0; i < n; ++i) {
+        numver=fractures.NumVertices[i];
+        A=fractures.ListVertices[i].col(0);
+        for (int j = 1; j < numver-1; ++j) {
+            B=fractures.ListVertices[i].col(j);
+            C=fractures.ListVertices[i].col(j+1);
+            AB<<B[0]-A[0],B[1]-A[1],B[2]-A[2];
+            AC<<C[0]-A[0],C[1]-A[1],C[2]-A[2];
+            area=0.5*((AB.cross(AC)).norm());
+            centroidtriangle[0]=(A[0]+B[0]+C[0])/3.0;
+            centroidtriangle[1]=(A[1]+B[1]+C[1])/3.0;
+            centroidtriangle[2]=(A[2]+B[2]+C[2])/3.0;
+            bari[0]+=area*centroidtriangle[0];
+            bari[1]+=area*centroidtriangle[1];
+            bari[2]+=area*centroidtriangle[2];
+            areatotale+=area;
+        }
+        bari[0]/=areatotale;
+        bari[1]/=areatotale;
+        bari[2]/=areatotale;
+
+        baricentri.push_back(bari);
+
+        areatotale=0;
+        bari[0]=0;
+        bari[1]=0;
+        bari[2]=0;
+
+        cout<<"bari n: "<<i<<" "<<scientific<<setprecision(16)<<baricentri[i].transpose()<<endl;
+
+    }
 
 }
+
 void Traces::CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int n,Traces& traces){//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
     Vector3d u;//vettore 1
     Vector3d P0;//primo punto del piano

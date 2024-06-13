@@ -50,6 +50,7 @@ struct Traces{
 };
 
 void ImportDFN(const string& filename,int n,Fractures& fractures);//funzione che importa i dati dai file DFN
+void sfere(Fractures& fractures, int n,vector<Vector3d> &baricentri);
 
 }
 ostream& operator<<(ostream& os,const vector<int> a);
