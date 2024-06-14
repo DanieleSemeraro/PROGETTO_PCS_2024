@@ -45,12 +45,12 @@ struct Traces{
 
     void CalcoloEstremi(int &NumberOfTraces,Fractures& fractures,Traces& traces);//funzione per trovare gli estremi delle fratture
     void Ordinamento(Fractures& fractures);//ultima funzione che permette di calcolare il numero di tracce presenti su ogni frattura, la loro lunghezza e ordinarle in maniera decrescente
-    void CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int n,Traces& traces);//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
+    void CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int n,Traces& traces,vector<Vector2i> &fratturescluse);//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
 
 };
 
 void ImportDFN(const string& filename,int n,Fractures& fractures);//funzione che importa i dati dai file DFN
-void sfere(Fractures& fractures, int n,vector<Vector3d> &baricentri);
+void sfere(Fractures& fractures, int n,vector<Vector2i> &fratturescluse);
 
 }
 ostream& operator<<(ostream& os,const vector<int> a);

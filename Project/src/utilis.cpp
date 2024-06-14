@@ -81,8 +81,8 @@ void ImportDFN(const string &filename,int n,Fractures& fractures)
     fin.close();
 }
 
-void sfere(Fractures& fractures, int n,vector<Vector3d> &baricentri){
-    vector<vector<int>> fratturescluse;//conterra tutte le coppie di fratture che sicuramente non creeranno tracce
+void sfere(Fractures& fractures, int n,vector<Vector2i> &fratturescluse){
+    vector<Vector3d> baricentri;//contine i baricentri delle fratture
     int numver=0;//numero vertici frattura
     Vector3d A;//vertici
     Vector3d B;
@@ -95,6 +95,10 @@ void sfere(Fractures& fractures, int n,vector<Vector3d> &baricentri){
     Vector3d bari;//baricentro della frattura
     bari<<0,0,0;
     double tol=0.00000001;
+    vector<double> raggi;//contiene i raggi di tutte le fratture
+    double R=0;//raggio singolo
+    double distanza;//distanza baricentro vertice
+    Vector2i id;
     for (int i = 0; i < n; ++i) {
         numver=fractures.NumVertices[i];
         A=fractures.ListVertices[i].col(0);
@@ -123,13 +127,37 @@ void sfere(Fractures& fractures, int n,vector<Vector3d> &baricentri){
         bari[1]=0;
         bari[2]=0;
 
-        cout<<"bari n: "<<i<<" "<<scientific<<setprecision(16)<<baricentri[i].transpose()<<endl;
+        //cout<<"bari n: "<<i<<" "<<scientific<<setprecision(16)<<baricentri[i].transpose()<<endl;
 
+        for (int j = 0; j < numver; ++j) {
+            A=fractures.ListVertices[i].col(j);
+            distanza=sqrt((A[0]-baricentri[i](0))*(A[0]-baricentri[i](0)) + (A[1]-baricentri[i](1))*(A[1]-baricentri[i](1)) + (A[2]-baricentri[i](2))*(A[2]-baricentri[i](2)));
+            if(distanza>R){
+                R=distanza;
+            }
+        }
+        raggi.push_back(R);
+        R=0;
+        //cout<<"raggio n: "<<i<<" "<<scientific<<setprecision(16)<<raggi[i]<<endl;
     }
 
+    for (int i = 0; i < n-1; ++i) {
+        for (int j = i+1; j < n; ++j) {
+            distanza=sqrt((baricentri[i](0)-baricentri[j](0))*(baricentri[i](0)-baricentri[j](0)) + (baricentri[i](1)-baricentri[j](1))*(baricentri[i](1)-baricentri[j](1)) + (baricentri[i](2)-baricentri[j](2))*(baricentri[i](2)-baricentri[j](2)));
+            if(distanza > (raggi[i]+raggi[j])){
+                id[0]=fractures.FractureId[i];
+                id[1]=fractures.FractureId[j];
+                fratturescluse.push_back(id);
+                //cout<<"non si intersecano le sfere delle fratture "<<scientific<<setprecision(16)<<id<<endl;
+            }
+            else{
+                //cout<<"si intersecano le sfere delle fratture "<<scientific<<setprecision(16)<<i<<" "<<j<<endl;
+            }
+        }
+    }
 }
 
-void Traces::CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int n,Traces& traces){//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
+void Traces::CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int n,Traces& traces,vector<Vector2i> &fratturescluse){//serve per ottenere la retta su cui somo presenti le tracce, restituisce punto e direzione di ogni retta utile con tracce
     Vector3d u;//vettore 1
     Vector3d P0;//primo punto del piano
     Vector3d P1;//secondo punto del piano
@@ -154,123 +182,143 @@ void Traces::CalcoloDirezioneTracce(int &NumberOfTraces,Fractures& fractures,int
     int c1=0;//contatore
     int c2=0;//contatore
     double tol=0.00000001;//tolleranza di 10^-8
+    Vector2i id;//trova coppie di id da verificare
+    int cont=0;//contatore per capire se una coppia di fratture si trova o meno in quelle d aescludere
 
     for (int i = 0; i < n-1; ++i) {//doppio ciclo per confrontare ogni rettangolo con gli altri per trovare eventuai tracce
         for (int j = i+1; j < n; ++j) {
-            P0=fractures.ListVertices[i].col(0);
-            P1=fractures.ListVertices[i].col(1);
-            P2=fractures.ListVertices[i].col(2);
-            u=P2-P0;
-            v=P1-P0;
-            n1=(u.cross(v)).normalized();
-            d1=n1.dot(P0);
+            id[0]=fractures.FractureId[i];
+            id[1]=fractures.FractureId[j];
+            for (const auto& item : fratturescluse) {
+                if(id == item){
+                    cont=1;
+                }
+            }
 
-            P0=fractures.ListVertices[j].col(0);
-            P1=fractures.ListVertices[j].col(1);
-            P2=fractures.ListVertices[j].col(2);
-            u=P2-P0;
-            v=P1-P0;
-            n2=(u.cross(v)).normalized();
-            d2=n2.dot(P0);
+            if(cont==1){
+                cont=0;
+                continue;
+            }
+            else{
+                cont=0;
+                P0=fractures.ListVertices[i].col(0);
+                P1=fractures.ListVertices[i].col(1);
+                P2=fractures.ListVertices[i].col(2);
+                u=P2-P0;
+                v=P1-P0;
+                n1=(u.cross(v)).normalized();
+                d1=n1.dot(P0);
 
-            if((n1.cross(n2)).norm()>0){
-                t=n1.cross(n2);
-                A.row(0)=n1;
-                A.row(1)=n2;
-                A.row(2)=t;
-                b<<d1,d2,0;
-                if(A.determinant()!=0){
-                    P=A.colPivHouseholderQr().solve(b);
-                    sis1=A*P;
-                    if((sis1(0)<=b(0)+tol && sis1(0)>=b(0)-tol) && (sis1(1)<=b(1)+tol && sis1(1)>=b(1)-tol) && (sis1(2)<=b(2)+tol && sis1(2)>=b(2)-tol)){// verifico che sis1 sia uguale a b rispetto una tolleranza tol
-                        for (int k = 0; k < fractures.NumVertices[i]; ++k) {//ora devo vedere se la retta trovata sia effetivamente una frattura oppure no. devo trovare le intersezioni tra la retta e la prima frattura e verificare che siano comprese tra i vertici del bordo
-                            if(k==3){
-                                alpha.col(0)=t;
-                                alpha.col(1)=fractures.ListVertices[i].col(0)-fractures.ListVertices[i].col(k);
-                                P0=fractures.ListVertices[i].col(k);
-                                P1=fractures.ListVertices[i].col(0);
-                                b=fractures.ListVertices[i].col(k)-P;
-                            }
-                            else{
-                                alpha.col(0)=t;
-                                alpha.col(1)=fractures.ListVertices[i].col(k+1)-fractures.ListVertices[i].col(k);
-                                P0=fractures.ListVertices[i].col(k);
-                                P1=fractures.ListVertices[i].col(k+1);
-                                b=fractures.ListVertices[i].col(k)-P;
-                            }
-                            if((t.cross(P1-P0)).norm()>0){
-                                sol=alpha.colPivHouseholderQr().solve(b);
-                                sis2=alpha*sol;
-                                if((sis2(0)<=b(0)+tol && sis2(0)>=b(0)-tol) && (sis2(1)<=b(1)+tol && sis2(1)>=b(1)-tol) && (sis2(2)<=b(2)+tol && sis2(2)>=b(2)-tol)){
-                                    p=P+sol(0)*t;
-                                    if(((P0(0)<p(0)||(p(0)<=P0(0)+tol && p(0)>=P0(0)-tol)) && (p(0)<P1(0)||(p(0)<=P1(0)+tol && p(0)>=P1(0)-tol))) || ((P0(0)>p(0)||(p(0)<=P0(0)+tol && p(0)>=P0(0)-tol)) && (p(0)>P1(0)||(p(0)<=P1(0)+tol && p(0)>=P1(0)-tol))))
-                                    {
-                                        if(((P0(1)<p(1)||(p(1)<=P0(1)+tol && p(1)>=P0(1)-tol)) && (p(1)<P1(1)||(p(1)<=P1(1)+tol && p(1)>=P1(1)-tol))) || ((P0(1)>p(1)||(p(1)<=P0(1)+tol && p(1)>=P0(1)-tol)) && (p(1)>P1(1)||(p(1)<=P1(1)+tol && p(1)>=P1(1)-tol))))
-                                        {
-                                            if(((P0(2)<p(2)||(p(2)<=P0(2)+tol && p(2)>=P0(2)-tol)) && (p(2)<P1(2)||(p(2)<=P1(2)+tol && p(2)>=P1(2)-tol))) || ((P0(2)>p(2)||(p(2)<=P0(2)+tol && p(2)>=P0(2)-tol)) && (p(2)>P1(2)||(p(2)<=P1(2)+tol && p(2)>=P1(2)-tol))))
-                                            {
-                                                //con questi if verifico che il punto p sia compreso tra due vertici
-                                                c1=c1+1;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if(c1==2){//nel caso affermativo che la retta intersechi due volte la prima frattura verifico che lo faccia anche con la seconda, in caso contrario ho risparmiato dei calcoli
-                            for (int k = 0; k < fractures.NumVertices[j]; ++k) {
+                P0=fractures.ListVertices[j].col(0);
+                P1=fractures.ListVertices[j].col(1);
+                P2=fractures.ListVertices[j].col(2);
+                u=P2-P0;
+                v=P1-P0;
+                n2=(u.cross(v)).normalized();
+                d2=n2.dot(P0);
+
+                if((n1.cross(n2)).norm()>0){
+                    t=n1.cross(n2);
+                    A.row(0)=n1;
+                    A.row(1)=n2;
+                    A.row(2)=t;
+                    b<<d1,d2,0;
+                    if(A.determinant()!=0){
+                        P=A.colPivHouseholderQr().solve(b);
+                        sis1=A*P;
+                        if((sis1(0)<=b(0)+tol && sis1(0)>=b(0)-tol) && (sis1(1)<=b(1)+tol && sis1(1)>=b(1)-tol) && (sis1(2)<=b(2)+tol && sis1(2)>=b(2)-tol)){// verifico che sis1 sia uguale a b rispetto una tolleranza tol
+                            for (int k = 0; k < fractures.NumVertices[i]; ++k) {//ora devo vedere se la retta trovata sia effetivamente una frattura oppure no. devo trovare le intersezioni tra la retta e la prima frattura e verificare che siano comprese tra i vertici del bordo
                                 if(k==3){
                                     alpha.col(0)=t;
-                                    alpha.col(1)=fractures.ListVertices[j].col(0)-fractures.ListVertices[j].col(k);
-                                    P0=fractures.ListVertices[j].col(k);
-                                    P1=fractures.ListVertices[j].col(0);
-                                    b=fractures.ListVertices[j].col(k)-P;
-
+                                    alpha.col(1)=fractures.ListVertices[i].col(0)-fractures.ListVertices[i].col(k);
+                                    P0=fractures.ListVertices[i].col(k);
+                                    P1=fractures.ListVertices[i].col(0);
+                                    b=fractures.ListVertices[i].col(k)-P;
                                 }
                                 else{
                                     alpha.col(0)=t;
-                                    alpha.col(1)=fractures.ListVertices[j].col(k+1)-fractures.ListVertices[j].col(k);
-                                    P0=fractures.ListVertices[j].col(k);
-                                    P1=fractures.ListVertices[j].col(k+1);
-                                    b=fractures.ListVertices[j].col(k)-P;
+                                    alpha.col(1)=fractures.ListVertices[i].col(k+1)-fractures.ListVertices[i].col(k);
+                                    P0=fractures.ListVertices[i].col(k);
+                                    P1=fractures.ListVertices[i].col(k+1);
+                                    b=fractures.ListVertices[i].col(k)-P;
                                 }
                                 if((t.cross(P1-P0)).norm()>0){
                                     sol=alpha.colPivHouseholderQr().solve(b);
                                     sis2=alpha*sol;
                                     if((sis2(0)<=b(0)+tol && sis2(0)>=b(0)-tol) && (sis2(1)<=b(1)+tol && sis2(1)>=b(1)-tol) && (sis2(2)<=b(2)+tol && sis2(2)>=b(2)-tol)){
                                         p=P+sol(0)*t;
-
                                         if(((P0(0)<p(0)||(p(0)<=P0(0)+tol && p(0)>=P0(0)-tol)) && (p(0)<P1(0)||(p(0)<=P1(0)+tol && p(0)>=P1(0)-tol))) || ((P0(0)>p(0)||(p(0)<=P0(0)+tol && p(0)>=P0(0)-tol)) && (p(0)>P1(0)||(p(0)<=P1(0)+tol && p(0)>=P1(0)-tol))))
                                         {
                                             if(((P0(1)<p(1)||(p(1)<=P0(1)+tol && p(1)>=P0(1)-tol)) && (p(1)<P1(1)||(p(1)<=P1(1)+tol && p(1)>=P1(1)-tol))) || ((P0(1)>p(1)||(p(1)<=P0(1)+tol && p(1)>=P0(1)-tol)) && (p(1)>P1(1)||(p(1)<=P1(1)+tol && p(1)>=P1(1)-tol))))
                                             {
                                                 if(((P0(2)<p(2)||(p(2)<=P0(2)+tol && p(2)>=P0(2)-tol)) && (p(2)<P1(2)||(p(2)<=P1(2)+tol && p(2)>=P1(2)-tol))) || ((P0(2)>p(2)||(p(2)<=P0(2)+tol && p(2)>=P0(2)-tol)) && (p(2)>P1(2)||(p(2)<=P1(2)+tol && p(2)>=P1(2)-tol))))
                                                 {
-
-                                                    c2=c2+1;
+                                                    //con questi if verifico che il punto p sia compreso tra due vertici
+                                                    c1=c1+1;
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+                            if(c1==2){//nel caso affermativo che la retta intersechi due volte la prima frattura verifico che lo faccia anche con la seconda, in caso contrario ho risparmiato dei calcoli
+                                for (int k = 0; k < fractures.NumVertices[j]; ++k) {
+                                    if(k==3){
+                                        alpha.col(0)=t;
+                                        alpha.col(1)=fractures.ListVertices[j].col(0)-fractures.ListVertices[j].col(k);
+                                        P0=fractures.ListVertices[j].col(k);
+                                        P1=fractures.ListVertices[j].col(0);
+                                        b=fractures.ListVertices[j].col(k)-P;
+
+                                    }
+                                    else{
+                                        alpha.col(0)=t;
+                                        alpha.col(1)=fractures.ListVertices[j].col(k+1)-fractures.ListVertices[j].col(k);
+                                        P0=fractures.ListVertices[j].col(k);
+                                        P1=fractures.ListVertices[j].col(k+1);
+                                        b=fractures.ListVertices[j].col(k)-P;
+                                    }
+                                    if((t.cross(P1-P0)).norm()>0){
+                                        sol=alpha.colPivHouseholderQr().solve(b);
+                                        sis2=alpha*sol;
+                                        if((sis2(0)<=b(0)+tol && sis2(0)>=b(0)-tol) && (sis2(1)<=b(1)+tol && sis2(1)>=b(1)-tol) && (sis2(2)<=b(2)+tol && sis2(2)>=b(2)-tol)){
+                                            p=P+sol(0)*t;
+
+                                            if(((P0(0)<p(0)||(p(0)<=P0(0)+tol && p(0)>=P0(0)-tol)) && (p(0)<P1(0)||(p(0)<=P1(0)+tol && p(0)>=P1(0)-tol))) || ((P0(0)>p(0)||(p(0)<=P0(0)+tol && p(0)>=P0(0)-tol)) && (p(0)>P1(0)||(p(0)<=P1(0)+tol && p(0)>=P1(0)-tol))))
+                                            {
+                                                if(((P0(1)<p(1)||(p(1)<=P0(1)+tol && p(1)>=P0(1)-tol)) && (p(1)<P1(1)||(p(1)<=P1(1)+tol && p(1)>=P1(1)-tol))) || ((P0(1)>p(1)||(p(1)<=P0(1)+tol && p(1)>=P0(1)-tol)) && (p(1)>P1(1)||(p(1)<=P1(1)+tol && p(1)>=P1(1)-tol))))
+                                                {
+                                                    if(((P0(2)<p(2)||(p(2)<=P0(2)+tol && p(2)>=P0(2)-tol)) && (p(2)<P1(2)||(p(2)<=P1(2)+tol && p(2)>=P1(2)-tol))) || ((P0(2)>p(2)||(p(2)<=P0(2)+tol && p(2)>=P0(2)-tol)) && (p(2)>P1(2)||(p(2)<=P1(2)+tol && p(2)>=P1(2)-tol))))
+                                                    {
+
+                                                        c2=c2+1;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(c1==2 && c2==2){//nel caso in cui la retta intersechi due volte sia un rettang che l altro vuol dire che è quella di un frattura fra essi quindi procedo a memorizzarmi le info utili
+
+                                vet<<fractures.FractureId[i],fractures.FractureId[j];
+                                traces.IDs.push_back(vet);
+                                mat.col(0)=P;
+                                mat.col(1)=t;
+                                traces.ListCord.push_back(mat);
+                                NumberOfTraces=NumberOfTraces+1;
+                            }
+                            c1=0;
+                            c2=0;
+
                         }
-
-                        if(c1==2 && c2==2){//nel caso in cui la retta intersechi due volte sia un rettang che l altro vuol dire che è quella di un frattura fra essi quindi procedo a memorizzarmi le info utili
-
-                            vet<<fractures.FractureId[i],fractures.FractureId[j];
-                            traces.IDs.push_back(vet);
-                            mat.col(0)=P;
-                            mat.col(1)=t;
-                            traces.ListCord.push_back(mat);
-                            NumberOfTraces=NumberOfTraces+1;
-                        }
-                        c1=0;
-                        c2=0;
-
                     }
                 }
+
             }
+
+
         }
     }
 

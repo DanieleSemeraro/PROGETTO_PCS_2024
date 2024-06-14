@@ -38,12 +38,14 @@ TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (
 
     int n=3; //numero inserito dall utente per decidere quante fratture visualizzare
     string filename="DFN/FR3_data.txt"; //nome file
+    vector<Vector2i> fratturescluse;//lista delle coppie di fratture che sicuramente non avranno tracce
     int NumberOfTraces=0; // numero totale di tracce su ogni rettangolo
     DFNLibrary::Fractures fractures;//chiamo la struct Fractures
     DFNLibrary::Traces traces;
     DFNLibrary::ImportDFN(filename,n, fractures); // la funzione restituisce FractureId e aggiorna NumVertices e ListVertices
     // un test su take funzione non è necessario in quanto stampa a terminale
-    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+    DFNLibrary::sfere(fractures,n,fratturescluse);
+    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
     // la funzione restituisce IDs, aggiorna NumberOfTraces, ListCord
 
     EXPECT_EQ(NumberOfTraces, 2);  // check su numero di tracce
@@ -77,10 +79,12 @@ TEST(FRACTURETEST, TestCalcoloEstremi) {
     int n=3; //numero inserito dall utente per decidere quante fratture visualizzare
     string filename="DFN/FR3_data.txt"; //nome file
     int NumberOfTraces=0; // numero totale di tracce su ogni rettangolo
+    vector<Vector2i> fratturescluse;
     DFNLibrary::Fractures fractures;//chiamo la struct Fractures
     DFNLibrary::Traces traces;
     DFNLibrary::ImportDFN(filename,n, fractures); // la funzione restituisce FractureId e aggiorna NumVertices e ListVertices
-    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+    DFNLibrary::sfere(fractures,n,fratturescluse);
+    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
     // la funzione restituisce IDs, aggiorna NumberOfTraces, ListCord
     traces.CalcoloEstremi(NumberOfTraces,fractures,traces); // all'interno della funzione viene anche aggiornato il vettore pass
 

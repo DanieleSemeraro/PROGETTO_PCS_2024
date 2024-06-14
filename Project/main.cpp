@@ -12,7 +12,7 @@ using namespace Eigen;
 int main() {
     unsigned int n; //numero inserito dall utente per decidere quante fratture visualizzare
     string filename; //nome file
-    vector<Vector3d> baricentri;
+    vector<Vector2i> fratturescluse;//conterra tutte le coppie di fratture che sicuramente non creeranno tracce
     int NumberOfTraces=0; // numero totale di tracce su ogni rettangolo
     DFNLibrary::Fractures fractures;//chiamo la struct Fractures
     DFNLibrary::Traces traces;//chiamo la struct Traces
@@ -26,8 +26,8 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,baricentri);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+        DFNLibrary::sfere(fractures,n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
         traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
         traces.Ordinamento(fractures);
         break;
@@ -37,8 +37,8 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,baricentri);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+        DFNLibrary::sfere(fractures,n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
         traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
         traces.Ordinamento(fractures);
         break;
@@ -48,8 +48,8 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,baricentri);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+        DFNLibrary::sfere(fractures,n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
         traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
         traces.Ordinamento(fractures);
         break;
@@ -59,8 +59,8 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,baricentri);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+        DFNLibrary::sfere(fractures,n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
         traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
         traces.Ordinamento(fractures);
         break;
@@ -70,8 +70,8 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,baricentri);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+        DFNLibrary::sfere(fractures,n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
         traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
         traces.Ordinamento(fractures);
         break;
@@ -81,8 +81,8 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,baricentri);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces);
+        DFNLibrary::sfere(fractures,n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
         traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
         traces.Ordinamento(fractures);
         break;
