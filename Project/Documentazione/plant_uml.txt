@@ -1,24 +1,46 @@
 ' Ogni codice UML inizia e termina con staruml - enduml
 @startuml 
 
-'main
-+ FractureId: std::vector<double> 
-+ NumVertices: std::vector<double>
-+ ListVertices: std::vector<MatrixXd>
-+ ListCord: std::vector<MatrixXd>
-+ IDs: std::vector<VectorXd>
-+ NumberOfTraces:unsigned int
-'utils
+title DFN
 
-+vector<double>ImportDFN(vector<double>&FractureId,vector<double>&NumVertices,
-                    \t \t \t  \t vector<MatrixXd>&ListVertices)
-+vector<VectorXd>CalcoloDirezioneTracce(int &NumberOfTraces,vector<VectorXd> &IDs,int n,vector<double> &FractureId,
-                        \t\t \t  vector<double>&NumVertices,vector<MatrixXd> &ListVertices,vector<MatrixXd> &ListCord)
+' Create package with folder style
+package DFNLibrary <<Folder>>
+{
 
-+ vector<MatrixXd> CalcoloEstremi(int &NumberOfTraces,vector<VectorXd> &IDs,vector<double> &NumVertices,vector<MatrixXd> &ListVertices,                                                                                                                                                                                                                                                                                                                                                                                                                                                \t \t \t                       vector<MatrixXd> &ListCord,vector<double> &pass)
-+cordinate=CalcoloEstremi()
-+ vector<MatrixXd> Ordinamento(vector<double> FractureId,vector<VectorXd> &IDs, vector<MatrixXd> &cordinate,vector<double> &pass)
+struct Fractures{
+' Visibility NameVaribale : Type
++ FractureId : vector<int>
++ listVertices : vector<MatrixXd>
++NumVertices : vector<int>
++ Fractures()
++ Fractures(FractureId, listVertices,NumVertices)
++ void sfere(int n,vector<Vector2i> &fratturescluse)
+.. Non member function ..
 
-void BubbleSort(vector<double>& data)
+void ImportDFN(const string& filepath,int n,Fractures& fractures)
+void BubbleSort(vector<double>& data);
+
+}
+
+
+struct Traces{
++ ListCord :vector<MatrixXd>
++ IDs : vector<VectorXi>
++pass : VectorXi
++cordinate : vector<MatrixXd>
++Traces()
++Traces(ListCord,IDs,cordinate,pass)
++void CalcoloEstremi (NumberOfTraces,fractures);
++ void Ordinamento (fractures);
++void Calcolo DirezioneTracce (NumberOfTraces,fractures,
+                            int n,vector<Vector2i> &fratturescluse)
+.. TESTTRACES ..
+Test CalcoloDirezioneTracce
+Test CalcoloEstremi
+}
+
+Fractures "1" o-left- "we find" Traces : if they intersect
+
+}
 
 @enduml

@@ -1,10 +1,10 @@
 #ifndef __TEST__H
-#define __TEST_H
+#define __TEST__H
 
 #include <gtest/gtest.h>
 #include "utilis.hpp"
 #include "Eigen/Eigen"
-#include <iostream>
+
 
 using namespace std;
 using namespace Eigen;
@@ -22,19 +22,19 @@ bool VectorsAreEquali(const VectorXi& vec1, const VectorXi& vec2) {
     return true;
 }
 
-bool VectorsAreEquald(const VectorXd& vec1, const VectorXd& vec2) {
+bool VectorsAreEquald (const VectorXd& vec1, const VectorXd& vec2, double tol =1e-8){// test sui double con tolleranza
     if (vec1.size() != vec2.size()) {
         return false;
     }
     for (Eigen::Index i = 0; i < vec1.size(); ++i) {
-        if (vec1[i] != vec2[i]) {
+        if (std::abs(vec1[i] - vec2[i]) > tol) {
             return false;
         }
     }
     return true;
 }
 
-TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (3 fratture) per assicurarsi che il codice funzioni
+TEST(TRACESTEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (3 fratture) per assicurarsi che il codice funzioni
 
     int n=3; //numero inserito dall utente per decidere quante fratture visualizzare
     string filename="DFN/FR3_data.txt"; //nome file
@@ -44,8 +44,8 @@ TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (
     DFNLibrary::Traces traces;
     DFNLibrary::ImportDFN(filename,n, fractures); // la funzione restituisce FractureId e aggiorna NumVertices e ListVertices
     // un test su take funzione non è necessario in quanto stampa a terminale
-    DFNLibrary::sfere(fractures,n,fratturescluse);
-    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
+    fractures.sfere(n,fratturescluse);
+    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
     // la funzione restituisce IDs, aggiorna NumberOfTraces, ListCord
 
     EXPECT_EQ(NumberOfTraces, 2);  // check su numero di tracce
@@ -74,7 +74,7 @@ TEST(FRACTURETEST, TestCalcoloDirezioneTracce){ // test sul caso più semplice (
 }
 
 
-TEST(FRACTURETEST, TestCalcoloEstremi) {
+TEST(TRACESTEST, TestCalcoloEstremi) {
 
     int n=3; //numero inserito dall utente per decidere quante fratture visualizzare
     string filename="DFN/FR3_data.txt"; //nome file
@@ -83,10 +83,10 @@ TEST(FRACTURETEST, TestCalcoloEstremi) {
     DFNLibrary::Fractures fractures;//chiamo la struct Fractures
     DFNLibrary::Traces traces;
     DFNLibrary::ImportDFN(filename,n, fractures); // la funzione restituisce FractureId e aggiorna NumVertices e ListVertices
-    DFNLibrary::sfere(fractures,n,fratturescluse);
-    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
+    fractures.sfere(n,fratturescluse);
+    traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
     // la funzione restituisce IDs, aggiorna NumberOfTraces, ListCord
-    traces.CalcoloEstremi(NumberOfTraces,fractures,traces); // all'interno della funzione viene anche aggiornato il vettore pass
+    traces.CalcoloEstremi(NumberOfTraces,fractures); // all'interno della funzione viene anche aggiornato il vettore pass
 
     EXPECT_EQ(traces.pass.size(),2);
     EXPECT_EQ(traces.cordinate.size(), 2);

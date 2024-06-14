@@ -26,9 +26,9 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,fratturescluse);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
-        traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
+        fractures.sfere(n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
+        traces.CalcoloEstremi(NumberOfTraces,fractures);
         traces.Ordinamento(fractures);
         break;
     case 10:
@@ -37,9 +37,9 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,fratturescluse);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
-        traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
+        fractures.sfere(n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
+        traces.CalcoloEstremi(NumberOfTraces,fractures);
         traces.Ordinamento(fractures);
         break;
     case 50:
@@ -48,9 +48,9 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,fratturescluse);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
-        traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
+        fractures.sfere(n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
+        traces.CalcoloEstremi(NumberOfTraces,fractures);
         traces.Ordinamento(fractures);
         break;
     case 82:
@@ -59,9 +59,9 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,fratturescluse);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
-        traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
+        fractures.sfere(n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
+        traces.CalcoloEstremi(NumberOfTraces,fractures);
         traces.Ordinamento(fractures);
         break;
     case 200:
@@ -70,9 +70,9 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,fratturescluse);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
-        traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
+        fractures.sfere(n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
+        traces.CalcoloEstremi(NumberOfTraces,fractures);
         traces.Ordinamento(fractures);
         break;
     case 362:
@@ -81,9 +81,9 @@ int main() {
         cout<<"Id delle fratture: "<<fractures.FractureId<<endl;
         cout<<"Numero di vertici di ogni frattura: "<<fractures.NumVertices<<endl;
         cout<<setprecision(15)<<fractures.ListVertices;
-        DFNLibrary::sfere(fractures,n,fratturescluse);
-        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,traces,fratturescluse);
-        traces.CalcoloEstremi(NumberOfTraces,fractures,traces);
+        fractures.sfere(n,fratturescluse);
+        traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
+        traces.CalcoloEstremi(NumberOfTraces,fractures);
         traces.Ordinamento(fractures);
         break;
     default:
