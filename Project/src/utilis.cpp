@@ -341,8 +341,6 @@ void Traces::CalcoloEstremi(int &NumberOfTraces,Fractures &fractures){//funzione
     int c=0;//contatore che permette di memorizzare le intersez nella matrice intersez al posto giusto
     int c1=0;// contatore che aiuta a memorizzare gli estremi della frattura nella mat estremi
 
-    pass.resize(NumberOfTraces);
-
     ofstream Outfile("Foglio1.txt");//inizio a stampare sul foglio
     Outfile<<"# Number of traces"<<endl;
     Outfile<<NumberOfTraces<<endl;
@@ -422,13 +420,6 @@ void Traces::CalcoloEstremi(int &NumberOfTraces,Fractures &fractures){//funzione
             }
 
         }
-        //questo servirà poi dopo, comunque calcola se la traccia è passante o non passante.
-        if( ( ((intersez(0,0)<=intersez(0,2)+tol && intersez(0,0)>=intersez(0,2)-tol)&&(intersez(1,0)<=intersez(1,2)+tol && intersez(1,0)>=intersez(1,2)-tol)&&(intersez(2,0)<=intersez(2,2)+tol && intersez(2,0)>=intersez(2,2)-tol)) || ((intersez(0,0)<=intersez(0,3)+tol && intersez(0,0)>=intersez(0,3)-tol)&&(intersez(1,0)<=intersez(1,3)+tol && intersez(1,0)>=intersez(1,3)-tol)&&(intersez(2,0)<=intersez(2,3)+tol && intersez(2,0)>=intersez(2,3)-tol)) ) && ( ((intersez(0,1)<=intersez(0,2)+tol && intersez(0,1)>=intersez(0,2)-tol)&&(intersez(1,1)<=intersez(1,2)+tol && intersez(1,1)>=intersez(1,2)-tol)&&(intersez(2,1)<=intersez(2,2)+tol && intersez(2,1)>=intersez(2,2)-tol)) || ((intersez(0,1)<=intersez(0,3)+tol && intersez(0,1)>=intersez(0,3)-tol)&&(intersez(1,1)<=intersez(1,3)+tol && intersez(1,1)>=intersez(1,3)-tol)&&(intersez(2,1)<=intersez(2,3)+tol && intersez(2,1)>=intersez(2,3)-tol)) ) ){
-            pass[k]=0;
-        }
-        else{
-            pass[k]=1;
-        }
         c=0;
         for (int z = 0; z < 4; ++z) {//ora trovo finalmente i due estremi della frattura, immagino di sovrappore due segmenti e di trovare gli estremi della loro intersezione
             if((z==0 || z==1) && c1<2){
@@ -480,8 +471,7 @@ void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di
     int Ntraces=0;//num tracce totali di ogni singola frattura
     bool Tips ;// ottiene valore true se è non passante, false se è passante
     double length;//lunghezza traccia
-    vector<double> lungP;//vettore contenente le lunghezzze delle tracce passanti
-    vector<double> lungNP;//vettore contenente le lunghezzze delle tracce non passanti
+    vector<double> lung;//vettore contenente le lunghezzze delle tracce
     double l;//var di supporto lunghezza
     double tol = 1e-8; // Tolleranza di 10^-8
     vector<double>  t;//memorizza i traceid , serve per evitare di stampare più volte la stessa riga
@@ -502,25 +492,30 @@ void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di
         Ntraces=0;
         for (unsigned int i = 0; i < IDs.size(); ++i) {
             if(k==IDs[i](0) || k==IDs[i](1)){
-                if(pass[i]==1){//memorizzo tutte le lunghezze delle tracce separandole in pass e non pass
-                    length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
-                    lungNP.push_back(length);
-                }
-                else{
-                    length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
-                    lungP.push_back(length);
-                }
+                length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                lung.push_back(length);
             }
         }
-        BubbleSort(lungNP);//le ordino in maniera decrescente con l'algoritmo spiegato in classe bubblesort
-        BubbleSort(lungP);
-        for (unsigned int j = 0; j < lungP.size(); ++j) {//adesso devo stampare queste lunghezze nel nuovo ordine ottenuto ma con le loro rispettive informazioni
-            l=lungP[j];
-            for (unsigned int i = 0; i < IDs.size(); ++i) {//ripete finchè non trova la lunghezza corretta (siamo nel caso di tracce passanti)
+        //le ordino in maniera decrescente con l'algoritmo spiegato in classe bubblesort
+        BubbleSort(lung);
+        for (unsigned int j = 0; j < lung.size(); ++j) {//adesso devo stampare queste lunghezze nel nuovo ordine ottenuto ma con le loro rispettive informazioni
+            l=lung[j];
+            for (unsigned int i = 0; i < IDs.size(); ++i) {//ripete finchè non trova la lunghezza corretta
                 auto it=find(t.begin(),t.end(),i);//serve per evitare di stampare più volte le stesse righe nel caso siano presenti lunghezze uguali
                 if(k==IDs[i](0) || k==IDs[i](1)){
-                    if(pass[i]==0){
+                    CalcoloPassante(k,i,fractures);
+                    if(pass==0){
                         Tips=false;
+                        length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
+                        if(l-tol<=length && length<=l+tol){
+                            if(it==t.end()){
+                                t.push_back(i);//memorizza gli traceID sempre per il fatto di non stampare più volte le stesse righe
+                                Outfile<<i<<"; "<<Tips<<"; "<<scientific<<setprecision(16)<<length<<endl;
+                            }
+                        }
+                    }
+                    else{
+                        Tips=true;
                         length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
                         if(l-tol<=length && length<=l+tol){
                             if(it==t.end()){
@@ -536,35 +531,63 @@ void Traces::Ordinamento(Fractures& fractures){//ultima funzione che permette di
         }
 
         t.clear();
-
-        for (unsigned int j = 0; j < lungNP.size(); ++j) {// esegue uguale a sopra, solo che lo fa con le tracce non passanti
-            l=lungNP[j];
-            for (unsigned int i = 0; i < IDs.size(); ++i) {
-                auto it=find(t.begin(),t.end(),i);
-                if(k==IDs[i](0) || k==IDs[i](1)){
-                    if(pass[i]==1){
-                        Tips=true;
-                        length=sqrt( (cordinate[i](0,0)-cordinate[i](0,1))*(cordinate[i](0,0)-cordinate[i](0,1)) + (cordinate[i](1,0)-cordinate[i](1,1))*(cordinate[i](1,0)-cordinate[i](1,1)) + (cordinate[i](2,0)-cordinate[i](2,1))*(cordinate[i](2,0)-cordinate[i](2,1)) );
-                        if(l-tol<=length && length<=l+tol){
-                            if(it==t.end()){
-                                t.push_back(i);
-                                Outfile<<i<<"; "<<Tips<<"; "<<scientific<<setprecision(16)<<length<<endl;
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
-        t.clear();
-        lungNP.clear();
-        lungP.clear();
+        lung.clear();
     }
 
     Outfile.close();
-
-
 }
+
+void Traces::CalcoloPassante(const int k,const int i,Fractures& fractures){
+    int numvertici=fractures.NumVertices[k];
+    int c=0;// contatore
+    double tol = 1e-8;
+    Vector3d AB;
+    Vector3d AC;
+    Vector3d BC;
+    double crossproduct=0;
+    for (int j = 0; j < numvertici; ++j) {//verifico se il primo estremo della traccia sia sul bordo della frattura
+        AB=fractures.ListVertices[k].col((j+1)%numvertici)-fractures.ListVertices[k].col(j);
+        AC=cordinate[i].col(0)-fractures.ListVertices[k].col(j);
+        BC=cordinate[i].col(0)-fractures.ListVertices[k].col(j+1);
+        crossproduct=AB.cross(AC).norm();
+        if(crossproduct > tol){//verifica che i punti siano in linea
+            continue;
+        }
+        else if(AB.dot(AC)<0 || AB.dot(AC) > AB.dot(AB)){// C si trova tra A e B se 0 <= dot(AB, AC) <= dot(AB, AB)
+            continue;
+        }
+        else{
+            c=c+1;
+        }
+    }
+
+    if(c==1){//nel caso in cui il primo estremo della traccia sia sul bordo proseguo e faccio lo stesso con il secondo
+        for (int j = 0; j < numvertici; ++j) {
+            AB=fractures.ListVertices[k].col((j+1)%numvertici)-fractures.ListVertices[k].col(j);
+            AC=cordinate[i].col(1)-fractures.ListVertices[k].col(j);
+            BC=cordinate[i].col(1)-fractures.ListVertices[k].col((j+1)%numvertici);
+            crossproduct=AB.cross(AC).norm();
+            if(crossproduct > tol){
+                continue;
+            }
+            else if(AB.dot(AC)<0 || AB.dot(AC) > AB.dot(AB)){
+                continue;
+            }
+            else{
+                c=c+1;
+            }
+        }
+    }
+
+    if(c==2){//se entrambi sono sul bordo è passante
+        pass=0;//traccia passante
+
+    }
+    else{
+        pass=1;//traccia non passante
+    }
+}
+
 void BubbleSort(vector<double>& data)//algoritmo bubblesort spiegato in classe, dato un vet in input lo restituisce riordinato
 {
     size_t rem_size = data.size();
