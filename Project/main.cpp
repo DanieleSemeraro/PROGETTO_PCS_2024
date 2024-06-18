@@ -93,3 +93,7 @@ int main() {
 
     return 0;
 }
+
+//Andrea Rostagno 295706
+//Jacopo Ferraris 294292
+//Daniele Semeraro 284238
