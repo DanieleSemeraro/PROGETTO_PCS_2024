@@ -18,7 +18,7 @@ struct Fractures{
 .. Non member function ..
 
 void ImportDFN(const string& filepath,int n,Fractures& fractures)
-void BubbleSort(vector<double>& data);
+void MergeSort(vector<double>& data);
 
 }
 
@@ -34,6 +34,8 @@ struct Traces{
 + void Ordinamento (fractures);
 +void Calcolo DirezioneTracce (NumberOfTraces,fractures,
                             int n,vector<Vector2i> &fratturescluse)
++void CalcoloPassante(const int k,const int i,fractures);
+
 .. TESTTRACES ..
 Test CalcoloDirezioneTracce
 Test CalcoloEstremi
