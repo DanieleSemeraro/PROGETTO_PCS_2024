@@ -79,6 +79,8 @@ TEST(TRACESTEST, TestCalcoloEstremi) {
     int n=3; //numero inserito dall utente per decidere quante fratture visualizzare
     string filename="DFN/FR3_data.txt"; //nome file
     int NumberOfTraces=0; // numero totale di tracce su ogni rettangolo
+    int idfrattura=0;
+    int idtraccia =0;
     vector<Vector2i> fratturescluse;
     DFNLibrary::Fractures fractures;//chiamo la struct Fractures
     DFNLibrary::Traces traces;
@@ -87,9 +89,15 @@ TEST(TRACESTEST, TestCalcoloEstremi) {
     traces.CalcoloDirezioneTracce(NumberOfTraces,fractures, n,fratturescluse);
     // la funzione restituisce IDs, aggiorna NumberOfTraces, ListCord
     traces.CalcoloEstremi(NumberOfTraces,fractures); // all'interno della funzione viene anche aggiornato il vettore pass
+    traces.CalcoloPassante(idfrattura,idtraccia,fractures);
+
+    EXPECT_EQ(traces.pass,0);
+
+    idtraccia=1;
+    traces.CalcoloPassante(idfrattura,idtraccia,fractures);
+    EXPECT_EQ(traces.pass,1);
 
 
-    //EXPECT_EQ(traces.pass,2);
     EXPECT_EQ(traces.cordinate.size(), 2);
 
     MatrixXd ExtremesFirstTrace(3,2);
@@ -109,7 +117,6 @@ TEST(TRACESTEST, TestCalcoloEstremi) {
     Vector2i TraccePassanti;
     TraccePassanti << 0, 1; // la prima traccia è passante, la seconda no
 
-    //EXPECT_TRUE(VectorsAreEquali(TraccePassanti, traces.pass));
 }
 }
 

@@ -647,3 +647,4 @@ ostream& operator<<(ostream& os, const vector<MatrixXd> a)
     }
     return os;
 }
+
