@@ -18,7 +18,7 @@ struct Fractures{
 .. Non member function ..
 
 void ImportDFN(const string& filepath,int n,Fractures& fractures)
-void MergeSort(vector<double>& data);
+void BubbleSort(vector<double>& data);
 
 }
 
